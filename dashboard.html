@@ -187,6 +187,18 @@
             line-height: 1.5;
             text-align: left;
         }
+        /* Tambahan untuk link artikel */
+        #education-section .article-link {
+            display: block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        #education-section .article-link:hover {
+            text-decoration: underline;
+        }
+
         #education-section button {
             margin-top: 20px;
             width: 100%;
@@ -205,6 +217,7 @@
             transform: translateY(-2px);
         }
 
+        /* Chat Section Styling */
         #chat-section .chat-box {
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -224,13 +237,18 @@
             max-width: 70%;
             word-wrap: break-word;
         }
-        #chat-section .message.user {
+        #chat-section .message.user { /* Pesan dari user yang sedang login (baik pasien/dokter) */
             background-color: #e1ffc7;
             align-self: flex-end;
             margin-left: auto;
         }
-        #chat-section .message.doctor {
+        #chat-section .message.doctor { /* Pesan dari dokter lain (untuk pasien) atau dari diri sendiri (untuk dokter) */
             background-color: #d1e7dd;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+        #chat-section .message.patient-other { /* Pesan dari pasien lain (untuk tampilan dokter) */
+            background-color: #f0f8ff;
             align-self: flex-start;
             margin-right: auto;
         }
@@ -256,29 +274,49 @@
         #chat-section .chat-input button:hover {
             background: #8e0c0c;
         }
-        #role-selection {
+        /* Styling untuk daftar pasien (khusus dokter) */
+        #patient-list-container {
+            margin-top: 20px;
             margin-bottom: 20px;
+            text-align: left;
+            max-height: 180px; /* Batasi tinggi untuk scroll */
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fcfcfc;
+        }
+
+        #patient-list-container h4 {
+            color: #a00e0e;
+            margin-bottom: 15px;
             text-align: center;
         }
-        #role-selection button {
-            padding: 10px 20px;
-            margin: 0 10px;
-            background-color: #a00e0e;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+
+        #patient-list-container button {
+            background-color: #f5f5f5;
+            color: #333;
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            border-radius: 8px;
             font-size: 1em;
-            transition: background 0.3s ease, transform 0.2s ease;
+            width: 100%;
+            text-align: left;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
         }
-        #role-selection button:hover {
-            background-color: #8e0c0c;
-            transform: translateY(-2px);
+
+        #patient-list-container button:hover {
+            background-color: #e0e0e0;
+            border-color: #c0c0c0;
         }
-        #role-selection button.active-role {
-            background-color: #5c0808;
-            box-shadow: 0 0 0 3px rgba(144, 11, 11, 0.4);
+        #patient-list-container button.active-patient {
+            background-color: #d1e7dd; /* Highlight the selected patient */
+            border-color: #a0c2a0;
+            font-weight: bold;
         }
+
     </style>
 </head>
 <body>
@@ -337,10 +375,6 @@
 
         <div id="chat-section" class="content-section" style="display: none;">
             <h3>Chat dengan Dokter</h3>
-            <div id="role-selection">
-                <button id="patient-role-btn" class="active-role">Saya Pasien</button>
-                <button id="doctor-role-btn">Saya Dokter</button>
-            </div>
             <div class="chat-box" id="chat-messages">
                 </div>
             <div class="chat-input">
@@ -360,12 +394,13 @@
     <script>
         // Konfigurasi Firebase Anda (HARUS SESUAI DENGAN PROYEK FIREBASE ANDA)
         const firebaseConfig = {
-            apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk", // Ganti dengan API Key Anda
-            authDomain: "arrhythme-ai-29cc8.firebaseapp.com", // Ganti dengan Auth Domain Anda
-            projectId: "arrhythme-ai-29cc8", // Ganti dengan Project ID Anda
-            storageBucket: "arrhythme-ai-29cc8.appspot.com",
-            messagingSenderId: "869423405995",
-            appId: "1:869423405995:web:d750c0530b9709029190ee"
+           apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk",
+             authDomain: "arrhythme-ai-29cc8.firebaseapp.com",
+             databaseURL: "https://arrhythme-ai-29cc8-default-rtdb.firebaseio.com",
+             projectId: "arrhythme-ai-29cc8",
+             storageBucket: "arrhythme-ai-29cc8.firebasestorage.app",
+             messagingSenderId: "869423405995",
+             appId: "1:869423405995:web:d750c0530b9709029190ee",
         };
 
         // Inisialisasi Firebase
@@ -407,10 +442,15 @@
         const chatMessagesDiv = document.getElementById('chat-messages');
         const chatMessageInput = document.getElementById('chat-message-input');
         const sendChatBtn = document.getElementById('send-chat-btn');
-        const patientRoleBtn = document.getElementById('patient-role-btn');
-        const doctorRoleBtn = document.getElementById('doctor-role-btn');
 
-        let currentUserRole = 'patient'; // Default role
+        // Variabel global untuk peran dan chat dokter
+        let currentUserRole = 'patient'; // Default role (akan di-overwrite dari Firestore)
+        let selectedPatientIdForDoctor = null; // UID pasien yang sedang dilihat/dibalas dokter
+
+        // Div untuk daftar pasien (hanya untuk dokter)
+        const patientListDiv = document.createElement('div');
+        patientListDiv.id = 'patient-list-container';
+        chatSection.insertBefore(patientListDiv, chatMessagesDiv); // Sisipkan di awal chatSection
 
         // --- Fungsi Utama ---
 
@@ -449,10 +489,33 @@
                         profilePlaceDobInput.value = userData.placeDob || '';
                         profileAddressInput.value = userData.address || '';
                         profilePhoneInput.value = userData.phone || '';
-                        currentUserRole = userData.role || 'patient';
+                        currentUserRole = userData.role || 'patient'; // Pastikan role terbaca
                         userRoleSpan.textContent = currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1);
+
+                        // --- Logika Pengalihan Dashboard Berdasarkan Peran ---
+                        if (currentUserRole === 'doctor') {
+                            showSection(chatSection); // Jika dokter, langsung ke Chat
+                            // Sembunyikan navigasi yang tidak relevan untuk dokter
+                            navProfileBtn.style.display = 'none';
+                            navHeartRateBtn.style.display = 'none';
+                            navEducationBtn.style.display = 'none';
+                            navChatBtn.classList.add('active'); // Pastikan tombol chat aktif
+                            patientListDiv.style.display = 'block'; // Tampilkan daftar pasien untuk dokter
+
+                        } else { // Jika pasien
+                            showSection(profileSection); // Default ke Profil untuk pasien
+                            // Pastikan semua tombol navigasi pasien ditampilkan
+                            navProfileBtn.style.display = 'inline-block';
+                            navHeartRateBtn.style.display = 'inline-block';
+                            navEducationBtn.style.display = 'inline-block';
+                            navChatBtn.style.display = 'inline-block';
+                            patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien untuk pasien
+                        }
+                        // --- Akhir Logika Pengalihan Dashboard ---
+
                     } else {
                         console.log("No user data found, creating new profile with default role 'patient'.");
+                        // Ini akan jarang terjadi jika sign-up sudah menyimpan peran, tapi tetap penting
                         db.collection('users').doc(user.uid).set({
                             email: user.email,
                             name: '',
@@ -460,8 +523,8 @@
                             placeDob: '',
                             address: '',
                             phone: '',
-                            role: 'patient'
-                        }, { merge: true }).then(() => { // Added merge: true here for creation too
+                            role: 'patient' // Default role jika user tidak ada di Firestore
+                        }, { merge: true }).then(() => {
                             profileNameInput.value = '';
                             profileNikInput.value = '';
                             profilePlaceDobInput.value = '';
@@ -470,16 +533,17 @@
                             userRoleSpan.textContent = 'Patient';
                             currentUserRole = 'patient';
                             console.log("New user profile created successfully.");
+                            showSection(profileSection); // Tampilkan profil section
+                            patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien
                         }).catch(error => {
                             console.error("Error creating new user profile:", error);
-                            alert("Gagal membuat profil baru: " + error.message); // Added alert for new profile creation error
+                            alert("Gagal membuat profil baru: " + error.message);
                         });
                     }
-                    updateChatInterfaceForRole();
-                    loadChatMessages();
+                    loadChatMessages(); // Selalu panggil ini untuk memuat pesan
                 }).catch(error => {
                     console.error("Error getting user profile:", error);
-                    alert("Gagal memuat profil: " + error.message); // Added alert for loading profile error
+                    alert("Gagal memuat profil: " + error.message);
                 });
 
             } else {
@@ -501,7 +565,6 @@
 
         // Logika Edit dan Simpan Profil
         editProfileBtn.addEventListener('click', () => {
-            console.log("Edit Profil button clicked!"); // DEBUGGING: Tambahkan ini
             profileNameInput.disabled = false;
             profileNikInput.disabled = false;
             profilePlaceDobInput.disabled = false;
@@ -513,7 +576,6 @@
         });
 
         saveProfileBtn.addEventListener('click', async () => {
-            console.log("Save Profil button clicked!"); // DEBUGGING: Tambahkan ini
             const user = auth.currentUser;
             if (user) {
                 const userName = profileNameInput.value.trim();
@@ -522,31 +584,18 @@
                 const userAddress = profileAddressInput.value.trim();
                 const userPhone = profilePhoneInput.value.trim();
 
-                console.log("Data to save:", { // DEBUGGING: Lihat data yang akan disimpan
-                    name: userName,
-                    email: user.email, // Email tidak perlu disimpan ulang kecuali memang berubah
-                    nik: userNik,
-                    placeDob: userPlaceDob,
-                    address: userAddress,
-                    phone: userPhone,
-                    role: currentUserRole // Pastikan peran juga disimpan
-                });
-                console.log("Current user role:", currentUserRole); // DEBUGGING: Cek nilai peran
-
                 try {
                     await db.collection('users').doc(user.uid).set({
                         name: userName,
-                        email: user.email, // Memasukkan email lagi untuk jaga-jaga
+                        email: user.email,
                         nik: userNik,
                         placeDob: userPlaceDob,
                         address: userAddress,
                         phone: userPhone,
-                        role: currentUserRole
+                        role: currentUserRole // Pastikan peran juga disimpan
                     }, { merge: true });
 
                     alert('Profil berhasil disimpan!');
-                    console.log('Profile saved successfully!');
-
                     profileNameInput.disabled = true;
                     profileNikInput.disabled = true;
                     profilePlaceDobInput.disabled = true;
@@ -556,11 +605,10 @@
                     editProfileBtn.style.display = 'inline-block';
                     saveProfileBtn.style.display = 'none';
                 } catch (error) {
-                    console.error("Error saving profile:", error); // DEBUGGING: Ini sangat penting!
+                    console.error("Error saving profile:", error);
                     alert("Gagal menyimpan profil: " + error.message);
                 }
             } else {
-                console.log("No user logged in when trying to save profile.");
                 alert("Anda harus login untuk menyimpan profil.");
             }
         });
@@ -569,19 +617,23 @@
         const articles = [
             {
                 title: "Apa itu Aritmia? Pelajari Lebih Lanjut tentang Jenis dan Penyebabnya",
-                content: "Aritmia adalah kondisi di mana detak jantung tidak teratur, terlalu cepat, atau terlalu lambat. Ini terjadi ketika impuls listrik yang mengoordinasikan detak jantung tidak berfungsi dengan baik. Ada berbagai jenis aritmia, termasuk fibrilasi atrium, takikardia, dan bradikardia. Penyebabnya bisa bervariasi, mulai dari penyakit jantung, tekanan darah tinggi, stres, hingga konsumsi kafein atau alkohol berlebihan. Penting untuk mengenali gejala seperti pusing, pingsan, atau nyeri dada dan segera mencari pertolongan medis."
+                content: "Aritmia adalah kondisi di mana detak jantung tidak teratur, terlalu cepat, atau terlalu lambat. Ini terjadi ketika impuls listrik yang mengoordinasikan detak jantung tidak berfungsi dengan baik. Ada berbagai jenis aritmia, termasuk fibrilasi atrium, takikardia, dan bradikardia. Penyebabnya bisa bervariasi, mulai dari penyakit jantung, tekanan darah tinggi, stres, hingga konsumsi kafein atau alkohol berlebihan. Penting untuk mengenali gejala seperti pusing, pingsan, atau nyeri dada dan segera mencari pertolongan medis.",
+                link: "https://www.halodoc.com/kesehatan/aritmia" // Contoh link eksternal
             },
             {
                 title: "Tips Gaya Hidup Sehat untuk Jantung Optimal",
-                content: "Menjaga kesehatan jantung adalah kunci untuk hidup yang panjang dan berkualitas. Beberapa tips gaya hidup sehat meliputi: 1. Diet seimbang: Konsumsi buah, sayur, biji-bijian, dan protein tanpa lemak. Hindari makanan olahan, tinggi gula, dan lemak jenuh. 2. Olahraga teratur: Lakukan aktivitas fisik moderat setidaknya 150 menit per minggu. 3. Kelola stres: Cari cara sehat untuk mengatasi stres, seperti meditasi, yoga, atau hobi. 4. Tidur cukup: Pastikan Anda mendapatkan 7-9 jam tidur berkualitas setiap malam. 5. Hindari merokok dan batasi alkohol."
+                content: "Menjaga kesehatan jantung adalah kunci untuk hidup yang panjang dan berkualitas. Beberapa tips gaya hidup sehat meliputi: 1. Diet seimbang: Konsumsi buah, sayur, biji-bijian, dan protein tanpa lemak. Hindari makanan olahan, tinggi gula, dan lemak jenuh. 2. Olahraga teratur: Lakukan aktivitas fisik moderat setidaknya 150 menit per minggu. 3. Kelola stres: Cari cara sehat untuk mengatasi stres, seperti meditasi, yoga, atau hobi. 4. Tidur cukup: Pastikan Anda mendapatkan 7-9 jam tidur berkualitas setiap malam. 5. Hindari merokok dan batasi alkohol.",
+                link: "https://www.alodokter.com/gaya-hidup-sehat-untuk-menjaga-kesehatan-jantung"
             },
             {
                 title: "Pentingnya Olahraga Teratur dan Nutrisi Seimbang",
-                content: "Olahraga teratur memperkuat otot jantung, meningkatkan sirkulasi darah, dan membantu menjaga berat badan ideal. Nutrisi seimbang menyediakan energi dan nutrisi penting yang dibutuhkan jantung untuk berfungsi optimal. Kombinasi keduanya secara signifikan mengurangi risiko penyakit jantung."
+                content: "Olahraga teratur memperkuat otot jantung, meningkatkan sirkulasi darah, dan membantu menjaga berat badan ideal. Nutrisi seimbang menyediakan energi dan nutrisi penting yang dibutuhkan jantung untuk berfungsi optimal. Kombinasi keduanya secara signifikan mengurangi risiko penyakit jantung.",
+                link: "https://www.mayoclinic.org/diseases-conditions/heart-disease/in-depth/heart-healthy-diet/art-20047702"
             },
             {
                 title: "Panduan Pertolongan Pertama untuk Serangan Jantung",
-                content: "Mengenali gejala serangan jantung dan mengetahui pertolongan pertama dapat menyelamatkan nyawa. Gejala umum meliputi nyeri dada yang menjalar ke lengan, leher, rahang, atau punggung, sesak napas, keringat dingin, mual, dan pusing. Jika Anda atau seseorang di sekitar Anda mengalami gejala ini: 1. Segera hubungi layanan darurat (misalnya, 112 atau 911). 2. Bantu orang tersebut duduk dengan nyaman. 3. Jika orang tersebut sadar dan tidak alergi, berikan tablet aspirin untuk dikunyah (jika tersedia dan sesuai). 4. Longgarkan pakaian yang ketat. 5. Tetap tenang dan tunggu bantuan medis datang."
+                content: "Mengenali gejala serangan jantung dan mengetahui pertolongan pertama dapat menyelamatkan nyawa. Gejala umum meliputi nyeri dada yang menjalar ke lengan, leher, rahang, atau punggung, sesak napas, keringat dingin, mual, dan pusing. Jika Anda atau seseorang di sekitar Anda mengalami gejala ini: 1. Segera hubungi layanan darurat (misalnya, 112 atau 911). 2. Bantu orang tersebut duduk dengan nyaman. 3. Jika orang tersebut sadar dan tidak alergi, berikan tablet aspirin untuk dikunyah (jika tersedia dan sesuai). 4. Longgarkan pakaian yang ketat. 5. Tetap tenang dan tunggu bantuan medis datang.",
+                link: "https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds)"
             }
         ];
 
@@ -591,79 +643,39 @@
                 const li = document.createElement('li');
                 const h4 = document.createElement('h4');
                 const p = document.createElement('p');
+                const a = document.createElement('a');
 
                 h4.textContent = article.title;
                 p.textContent = article.content;
+                a.href = article.link;
+                a.textContent = 'Baca Selengkapnya';
+                a.target = '_blank'; // Buka di tab baru
+                a.classList.add('article-link');
 
                 li.appendChild(h4);
                 li.appendChild(p);
+                li.appendChild(a); // Tambahkan link
                 articleList.appendChild(li);
             });
         }
 
         // --- Chat Section ---
 
-        patientRoleBtn.addEventListener('click', () => {
-            currentUserRole = 'patient';
-            updateChatInterfaceForRole();
-            userRoleSpan.textContent = 'Patient';
-            saveUserRole(currentUserRole);
-            loadChatMessages();
-        });
-
-        doctorRoleBtn.addEventListener('click', () => {
-            currentUserRole = 'doctor';
-            updateChatInterfaceForRole();
-            userRoleSpan.textContent = 'Doctor';
-            saveUserRole(currentUserRole);
-            loadChatMessages();
-        });
-
-        function updateChatInterfaceForRole() {
-            if (currentUserRole === 'patient') {
-                patientRoleBtn.classList.add('active-role');
-                doctorRoleBtn.classList.remove('active-role');
-                chatMessageInput.placeholder = "Ketik pesan Anda untuk dokter...";
-                sendChatBtn.textContent = "Kirim";
-            } else if (currentUserRole === 'doctor') {
-                patientRoleBtn.classList.remove('active-role');
-                doctorRoleBtn.classList.add('active-role');
-                chatMessageInput.placeholder = "Ketik balasan Anda untuk pasien...";
-                sendChatBtn.textContent = "Balas";
-            }
-        }
-
-        async function saveUserRole(role) {
-            const user = auth.currentUser;
-            if (user) {
-                try {
-                    await db.collection('users').doc(user.uid).set({
-                        role: role
-                    }, { merge: true });
-                    console.log("User role updated to:", role);
-                } catch (error) {
-                    console.error("Error saving user role:", error);
-                }
-            }
-        }
-
         function displayMessage(message) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
 
-            let senderIdentifier = '';
             if (auth.currentUser && message.senderId === auth.currentUser.uid) {
-                messageDiv.classList.add('user');
+                messageDiv.classList.add('user'); // Pesan dari user yang sedang login
                 messageDiv.textContent = message.text;
             } else {
                 if (message.senderRole === 'doctor') {
-                    messageDiv.classList.add('doctor');
-                    senderIdentifier = 'Dokter';
+                    messageDiv.classList.add('doctor'); // Pesan dari dokter lain (untuk pasien)
+                    messageDiv.innerHTML = `<strong>Dokter ${message.senderName || message.senderEmail}:</strong> ${message.text}`;
                 } else {
-                    messageDiv.classList.add('doctor');
-                    senderIdentifier = message.senderName || message.senderEmail;
+                    messageDiv.classList.add('patient-other'); // Pesan dari pasien lain (untuk tampilan dokter)
+                    messageDiv.innerHTML = `<strong>Pasien ${message.senderName || message.senderEmail}:</strong> ${message.text}`;
                 }
-                messageDiv.innerHTML = `<strong>${senderIdentifier}:</strong> ${message.text}`;
             }
             chatMessagesDiv.appendChild(messageDiv);
         }
@@ -672,24 +684,39 @@
             const messageText = chatMessageInput.value.trim();
             const user = auth.currentUser;
 
-            if (messageText && user) {
-                const userName = profileNameInput.value.trim();
+            if (!messageText || !user) {
+                return;
+            }
 
-                try {
-                    await db.collection('chats').add({
-                        senderId: user.uid,
-                        senderRole: currentUserRole,
-                        senderEmail: user.email,
-                        senderName: userName || user.email,
-                        text: messageText,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    chatMessageInput.value = '';
-                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-                } catch (error) {
-                    console.error("Error sending message:", error);
-                    alert("Gagal mengirim pesan: " + error.message);
-                }
+            const userName = profileNameInput.value.trim() || user.email;
+            const userRole = currentUserRole;
+
+            try {
+                let chatData = {
+                    senderId: user.uid,
+                    senderRole: userRole,
+                    senderEmail: user.email,
+                    senderName: userName,
+                    text: messageText,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    type: userRole === 'patient' ? 'general_consultation' : 'doctor_reply',
+                    // Untuk pasien, originalPatientId adalah UID mereka sendiri
+                    // Untuk dokter, originalPatientId adalah UID pasien yang sedang mereka balas (selectedPatientIdForDoctor)
+                    // Jika dokter belum memilih pasien, originalPatientId akan menjadi UID dokter itu sendiri (fallback)
+                    originalPatientId: userRole === 'patient' ? user.uid : (selectedPatientIdForDoctor || user.uid)
+                };
+
+                await db.collection('chats').add(chatData);
+                chatMessageInput.value = '';
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+
+                // Jika dokter mengirim pesan, dan belum ada pasien terpilih,
+                // mungkin perlu me-refresh daftar pasien atau menandai chat ini.
+                // Untuk kesederhanaan, ini akan ditangani oleh loadChatMessages berikutnya.
+
+            } catch (error) {
+                console.error("Error sending message:", error);
+                alert("Gagal mengirim pesan: " + error.message);
             }
         }
 
@@ -701,23 +728,98 @@
         });
 
         function loadChatMessages() {
-            chatMessagesDiv.innerHTML = '';
-            db.collection('chats').orderBy('timestamp').onSnapshot(snapshot => {
-                chatMessagesDiv.innerHTML = '';
-                snapshot.forEach(doc => {
-                    const message = doc.data();
-                    displayMessage(message);
-                });
-                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-            }, error => {
-                console.error("Error loading chat messages:", error);
-            });
+            chatMessagesDiv.innerHTML = ''; // Kosongkan chat sebelumnya
+            patientListDiv.innerHTML = ''; // Kosongkan daftar pasien
+
+            if (currentUserRole === 'patient') {
+                patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien untuk pasien
+                // Pasien hanya melihat pesan yang `originalPatientId`-nya adalah UID mereka
+                db.collection('chats')
+                    .where('originalPatientId', '==', auth.currentUser.uid)
+                    .orderBy('timestamp')
+                    .onSnapshot(snapshot => {
+                        chatMessagesDiv.innerHTML = ''; // Kosongkan lagi untuk update real-time
+                        snapshot.forEach(doc => {
+                            const message = doc.data();
+                            displayMessage(message);
+                        });
+                        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                    }, error => {
+                        console.error("Error loading patient's chat messages:", error);
+                    });
+
+            } else if (currentUserRole === 'doctor') {
+                patientListDiv.style.display = 'block';
+                chatMessagesDiv.innerHTML = '<h3>Pilih pasien dari daftar di atas untuk melihat chat.</h3>'; // Pesan awal untuk dokter
+
+                // Dokter akan melihat semua pasien yang sudah mengirim pesan
+                db.collection('chats')
+                    .where('senderRole', '==', 'patient') // Hanya ambil pesan yang dikirim pasien
+                    .orderBy('timestamp', 'desc') // Ambil yang terbaru dulu
+                    .get() // Gunakan get() sekali untuk mendapatkan daftar pasien unik
+                    .then(snapshot => {
+                        const patients = new Map(); // Menggunakan Map untuk menyimpan pasien unik
+                        snapshot.forEach(doc => {
+                            const msg = doc.data();
+                            // Jika pesan ini bukan dari dokter itu sendiri dan punya originalPatientId
+                            if (msg.senderRole === 'patient' && msg.originalPatientId) {
+                                patients.set(msg.originalPatientId, {
+                                    id: msg.originalPatientId,
+                                    name: msg.senderName,
+                                    email: msg.senderEmail
+                                });
+                            }
+                        });
+
+                        if (patients.size === 0) {
+                            patientListDiv.innerHTML = '<p>Belum ada pasien yang memulai chat.</p>';
+                        } else {
+                            patientListDiv.innerHTML = '<h4>Daftar Chat Pasien:</h4>';
+                            patients.forEach(patient => {
+                                const patientButton = document.createElement('button');
+                                patientButton.textContent = `Chat dengan ${patient.name || patient.email}`;
+                                patientButton.dataset.patientId = patient.id; // Simpan UID pasien di data-attribute
+
+                                patientButton.addEventListener('click', () => {
+                                    selectedPatientIdForDoctor = patient.id;
+                                    // Hapus highlight dari semua tombol pasien
+                                    document.querySelectorAll('#patient-list-container button').forEach(btn => {
+                                        btn.classList.remove('active-patient');
+                                    });
+                                    // Tambahkan highlight ke tombol yang sedang diklik
+                                    patientButton.classList.add('active-patient');
+
+                                    // Mulai mendengarkan pesan hanya untuk pasien yang dipilih
+                                    db.collection('chats')
+                                        .where('originalPatientId', '==', selectedPatientIdForDoctor)
+                                        .orderBy('timestamp')
+                                        .onSnapshot(snapshot => {
+                                            chatMessagesDiv.innerHTML = `<h4 style="text-align: center;">Chat dengan ${patient.name || patient.email}</h4>`;
+                                            snapshot.forEach(doc => {
+                                                const message = doc.data();
+                                                displayMessage(message);
+                                            });
+                                            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                                        }, error => {
+                                            console.error("Error loading specific patient chat messages:", error);
+                                        });
+                                });
+                                patientListDiv.appendChild(patientButton);
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error getting patient list for doctor:", error);
+                    });
+            }
         }
+
 
         // --- Inisialisasi Saat Halaman Dimuat ---
         document.addEventListener('DOMContentLoaded', () => {
-            showSection(profileSection);
-            loadEducationArticles();
+            // Peran akan ditentukan oleh auth.onAuthStateChanged, yang akan memanggil showSection
+            // jadi tidak perlu panggil showSection(profileSection) secara langsung di sini.
+            loadEducationArticles(); // Muat artikel edukasi
 
             navProfileBtn.addEventListener('click', () => showSection(profileSection));
             navHeartRateBtn.addEventListener('click', () => showSection(heartRateSection));
