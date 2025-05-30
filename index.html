@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ArrythME-AI</title>
+    <title>ArrythME-AI - Login / Register</title>
     <style>
         body {
             font-family: 'Segoe UI', sans-serif;
@@ -94,7 +94,9 @@
             font-size: 17px;
         }
 
-        .input-group input {
+        .input-group input[type="text"],
+        .input-group input[type="email"],
+        .input-group input[type="password"] {
             width: 100%;
             padding: 14px 15px;
             border: 1px solid #ddd;
@@ -108,6 +110,19 @@
             border-color: #007bff;
             box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
         }
+
+        .input-group input[type="radio"] {
+            width: auto;
+            margin-right: 5px;
+            transform: scale(1.2); /* Make radio buttons slightly larger */
+        }
+        .input-group label[for*="role"] { /* Adjust label for radio buttons */
+            display: inline;
+            font-weight: normal;
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
 
         .login-button {
             width: 100%;
@@ -195,7 +210,7 @@
 </head>
 <body>
     <div class="container">
-        <img src="image/LOGO_mini.png" alt="Mini Logo" class="corner-logo">
+        <img src="image/imagesnode-4.png.jpg" alt="Mini Logo" class="corner-logo">
 
         <h1>WELCOME!</h1>
         <p class="app-name">ArrhythME-AI</p>
@@ -208,7 +223,8 @@
 
         <div class="login-form">
             <div class="input-group" id="username-group" style="display: none;">
-                <label for="username">Nama Lengkap</label> <input type="text" id="username" placeholder="Masukkan Nama Lengkap" required>
+                <label for="username">Nama Lengkap</label>
+                <input type="text" id="username" placeholder="Masukkan Nama Lengkap" required>
             </div>
             <div class="input-group">
                 <label for="email">Email</label>
@@ -219,6 +235,15 @@
                 <input type="password" id="password" placeholder="Password" required>
             </div>
 
+            <div class="input-group" id="role-selection-group" style="display: none;">
+                <label>Daftar Sebagai:</label>
+                <div style="display: flex; gap: 20px; margin-top: 5px; justify-content: center;">
+                    <input type="radio" id="signup-role-patient" name="signup-role" value="patient" checked>
+                    <label for="signup-role-patient">Pasien</label>
+                    <input type="radio" id="signup-role-doctor" name="signup-role" value="doctor">
+                    <label for="signup-role-doctor">Dokter</label>
+                </div>
+            </div>
             <button id="auth-btn" class="login-button" type="button">Login</button>
             <button id="toggle-btn" class="toggle-btn" type="button">Belum punya akun? Daftar di sini</button>
         </div>
@@ -229,7 +254,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script>
-        // Pastikan Anda memiliki file LOGO_mini.png di folder image/
         document.addEventListener('DOMContentLoaded', () => {
             const appLogo = document.getElementById('app-logo');
             const cornerLogo = document.querySelector('.corner-logo');
@@ -250,23 +274,24 @@
 
         // Firebase Config Anda (HARUS SESUAI DENGAN PROYEK FIREBASE ANDA)
         const firebaseConfig = {
-            apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk", // Ganti dengan API Key Anda
-            authDomain: "arrhythme-ai-29cc8.firebaseapp.com", // Ganti dengan Auth Domain Anda
-            projectId: "arrhythme-ai-29cc8", // Ganti dengan Project ID Anda
-            storageBucket: "arrhythme-ai-29cc8.appspot.com",
-            messagingSenderId: "869423405995",
-            appId: "1:869423405995:web:d750c0530b9709029190ee"
+             apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk",
+             authDomain: "arrhythme-ai-29cc8.firebaseapp.com",
+             databaseURL: "https://arrhythme-ai-29cc8-default-rtdb.firebaseio.com",
+             projectId: "arrhythme-ai-29cc8",
+             storageBucket: "arrhythme-ai-29cc8.firebasestorage.app",
+             messagingSenderId: "869423405995",
+             appId: "1:869423405995:web:d750c0530b9709029190ee",
         };
 
         // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
-        const db = firebase.firestore(); // Inisialisasi Firestore
+        const db = firebase.firestore();
 
         // Variabel state untuk mode login/signup
         let isLoginMode = true;
 
-        // Ambil elemen DOM sekali untuk efisiensi
+        // Ambil elemen DOM
         const formTitle = document.getElementById('form-title');
         const authBtn = document.getElementById('auth-btn');
         const toggleBtn = document.getElementById('toggle-btn');
@@ -275,6 +300,9 @@
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const errorEl = document.getElementById('error-message');
+        const roleSelectionGroup = document.getElementById('role-selection-group'); // Tambahan
+        const signupRolePatientRadio = document.getElementById('signup-role-patient'); // Tambahan
+        const signupRoleDoctorRadio = document.getElementById('signup-role-doctor'); // Tambahan
 
         // Handle Toggle Button
         if (toggleBtn) {
@@ -289,14 +317,16 @@
                     ? 'Belum punya akun? Daftar di sini'
                     : 'Sudah punya akun? Login di sini';
 
-                // Tampilkan/sembunyikan input username
+                // Tampilkan/sembunyikan input username dan pilihan peran
                 usernameGroup.style.display = isLoginMode ? 'none' : 'block';
+                roleSelectionGroup.style.display = isLoginMode ? 'none' : 'block'; // Tampilkan/sembunyikan group radio button
 
                 // Clear form and error message
                 usernameInput.value = '';
                 emailInput.value = '';
                 passwordInput.value = '';
                 errorEl.textContent = '';
+                signupRolePatientRadio.checked = true; // Reset pilihan peran ke Pasien
             });
         }
 
@@ -305,7 +335,7 @@
             authBtn.addEventListener('click', async function() {
                 const email = emailInput.value.trim();
                 const password = passwordInput.value.trim();
-                const username = usernameInput.value.trim(); // Ambil username
+                const username = usernameInput.value.trim();
 
                 errorEl.textContent = ''; // Clear previous error
 
@@ -319,17 +349,20 @@
                         // Login
                         await auth.signInWithEmailAndPassword(email, password);
                         console.log("Login berhasil!");
-                        window.location.href = 'dashboard.html'; // Redirect ke dashboard
+                        // Redirect ke dashboard akan ditangani oleh onAuthStateChanged di dashboard.html
+                        window.location.href = 'dashboard.html';
                     } else {
                         // Register
+                        let selectedRole = signupRolePatientRadio.checked ? 'patient' : 'doctor';
+
                         const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                         const user = userCredential.user;
 
-                        // Simpan data user ke Firestore dengan role default 'patient'
+                        // Simpan data user ke Firestore dengan peran yang dipilih
                         await db.collection('users').doc(user.uid).set({
                             email: email,
-                            name: username, // Simpan sebagai 'name' agar konsisten dengan profil dashboard
-                            role: 'patient', // Tetapkan peran default 'patient' saat daftar
+                            name: username,
+                            role: selectedRole, // Peran yang dipilih!
                             createdAt: firebase.firestore.FieldValue.serverTimestamp()
                         });
 
@@ -362,11 +395,8 @@
         // Cek jika pengguna sudah login saat halaman dimuat
         auth.onAuthStateChanged(user => {
             if (user && window.location.pathname.endsWith('/index.html')) {
-                // Jika user sudah login dan sedang di halaman index.html, redirect ke dashboard
                 window.location.href = 'dashboard.html';
             }
-            // Tidak perlu redirect jika user belum login di index.html, karena itu memang halaman login/register
-            // dan tidak perlu redirect jika user sudah login di dashboard.html (ditangani di dashboard.html sendiri)
         });
     </script>
 </body>
