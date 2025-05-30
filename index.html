@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ArrythME-AI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #ca7e7e;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: white;
+            min-width: 300px;
+            max-width: 960px;
+            width: 90%;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            position: relative;
+        }
+
+        .corner-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: auto;
+            z-index: 10;
+        }
+
+        h1 {
+            color: #971818;
+            margin-bottom: 5px;
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+        .app-name {
+            font-size: 28px;
+            color: #971818;
+            font-weight: bold;
+            margin-top: 0;
+            margin-bottom: 25px;
+            display: block;
+        }
+
+        .logo {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
+            display: block;
+        }
+
+        .tagline {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 18px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .input-group {
+            width: 100%;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+            font-size: 17px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 17px;
+            box-sizing: border-box;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 16px;
+            background: #8c1c1c;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            margin-top: 15px;
+        }
+
+        .login-button:hover {
+            background: #a02727;
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #8c1c1c;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 15px;
+            margin-top: 25px;
+            display: inline-block;
+            padding: 5px;
+        }
+
+        .error {
+            color: #ff3333;
+            margin-top: 10px;
+            font-size: 14px;
+            min-height: 20px;
+        }
+
+        /* Media query untuk ukuran layar desktop */
+        @media (min-width: 768px) {
+            .container {
+                width: 80%;
+                max-width: 960px;
+                padding: 50px;
+            }
+
+            .corner-logo {
+                top: 30px;
+                left: 30px;
+                width: 60px;
+            }
+
+            h1 {
+                font-size: 48px;
+            }
+            .app-name {
+                font-size: 36px;
+                margin-bottom: 35px;
+            }
+
+            .logo {
+                width: 150px;
+                height: 150px;
+            }
+
+            .login-form {
+                max-width: 350px;
+            }
+
+            .input-group label {
+                font-size: 18px;
+            }
+
+            .input-group input {
+                font-size: 18px;
+                padding: 16px 18px;
+            }
+
+            .login-button {
+                font-size: 20px;
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="image/LOGO_mini.png" alt="Mini Logo" class="corner-logo">
+
+        <h1>WELCOME!</h1>
+        <p class="app-name">ArrhythME-AI</p>
+
+        <img src="image/LOGO.png" alt="ArrhythME-AI Logo" class="logo" id="app-logo">
+
+        <p class="tagline">Detect, Monitor, and Protect</p>
+
+        <h2 id="form-title">Log In</h2>
+
+        <div class="login-form">
+            <div class="input-group" id="username-group" style="display: none;">
+                <label for="username">Nama Lengkap</label> <input type="text" id="username" placeholder="Masukkan Nama Lengkap" required>
+            </div>
+            <div class="input-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="Email" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Password" required>
+            </div>
+
+            <button id="auth-btn" class="login-button" type="button">Login</button>
+            <button id="toggle-btn" class="toggle-btn" type="button">Belum punya akun? Daftar di sini</button>
+        </div>
+        <p id="error-message" class="error"></p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script>
+        // Pastikan Anda memiliki file LOGO_mini.png di folder image/
+        document.addEventListener('DOMContentLoaded', () => {
+            const appLogo = document.getElementById('app-logo');
+            const cornerLogo = document.querySelector('.corner-logo');
+
+            if (appLogo) {
+                appLogo.onerror = function() {
+                    console.log("Logo tengah tidak ditemukan, menggunakan placeholder.");
+                    this.src = "https://via.placeholder.com/120x120?text=ArrhythME-AI";
+                };
+            }
+            if (cornerLogo) {
+                cornerLogo.onerror = function() {
+                    console.log("Logo pojok tidak ditemukan, menggunakan placeholder.");
+                    this.src = "https://via.placeholder.com/50x50?text=Logo";
+                };
+            }
+        });
+
+        // Firebase Config Anda (HARUS SESUAI DENGAN PROYEK FIREBASE ANDA)
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk", // Ganti dengan API Key Anda
+            authDomain: "arrhythme-ai-29cc8.firebaseapp.com", // Ganti dengan Auth Domain Anda
+            projectId: "arrhythme-ai-29cc8", // Ganti dengan Project ID Anda
+            storageBucket: "arrhythme-ai-29cc8.appspot.com",
+            messagingSenderId: "869423405995",
+            appId: "1:869423405995:web:d750c0530b9709029190ee"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore(); // Inisialisasi Firestore
+
+        // Variabel state untuk mode login/signup
+        let isLoginMode = true;
+
+        // Ambil elemen DOM sekali untuk efisiensi
+        const formTitle = document.getElementById('form-title');
+        const authBtn = document.getElementById('auth-btn');
+        const toggleBtn = document.getElementById('toggle-btn');
+        const usernameGroup = document.getElementById('username-group');
+        const usernameInput = document.getElementById('username');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorEl = document.getElementById('error-message');
+
+        // Handle Toggle Button
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                isLoginMode = !isLoginMode;
+
+                // Update UI
+                formTitle.textContent = isLoginMode ? 'Log In' : 'Sign Up';
+                authBtn.textContent = isLoginMode ? 'Login' : 'Daftar';
+                this.textContent = isLoginMode
+                    ? 'Belum punya akun? Daftar di sini'
+                    : 'Sudah punya akun? Login di sini';
+
+                // Tampilkan/sembunyikan input username
+                usernameGroup.style.display = isLoginMode ? 'none' : 'block';
+
+                // Clear form and error message
+                usernameInput.value = '';
+                emailInput.value = '';
+                passwordInput.value = '';
+                errorEl.textContent = '';
+            });
+        }
+
+        // Handle Authentication (Login/Register)
+        if (authBtn) {
+            authBtn.addEventListener('click', async function() {
+                const email = emailInput.value.trim();
+                const password = passwordInput.value.trim();
+                const username = usernameInput.value.trim(); // Ambil username
+
+                errorEl.textContent = ''; // Clear previous error
+
+                if (!email || !password || (!isLoginMode && !username)) {
+                    errorEl.textContent = 'Email, password, dan nama lengkap (saat daftar) wajib diisi!';
+                    return;
+                }
+
+                try {
+                    if (isLoginMode) {
+                        // Login
+                        await auth.signInWithEmailAndPassword(email, password);
+                        console.log("Login berhasil!");
+                        window.location.href = 'dashboard.html'; // Redirect ke dashboard
+                    } else {
+                        // Register
+                        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                        const user = userCredential.user;
+
+                        // Simpan data user ke Firestore dengan role default 'patient'
+                        await db.collection('users').doc(user.uid).set({
+                            email: email,
+                            name: username, // Simpan sebagai 'name' agar konsisten dengan profil dashboard
+                            role: 'patient', // Tetapkan peran default 'patient' saat daftar
+                            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        alert('Registrasi berhasil! Silakan login.');
+                        console.log("Registrasi berhasil!");
+                        if (toggleBtn) {
+                            toggleBtn.click(); // Otomatis beralih ke mode login
+                        }
+                    }
+                } catch (error) {
+                    console.error("Auth error:", error);
+                    errorEl.textContent = getErrorMessage(error);
+                }
+            });
+        }
+
+        // Helper function for error messages
+        function getErrorMessage(error) {
+            switch (error.code) {
+                case 'auth/invalid-email': return 'Format email tidak valid.';
+                case 'auth/user-not-found': return 'Email tidak terdaftar.';
+                case 'auth/wrong-password': return 'Password salah.';
+                case 'auth/email-already-in-use': return 'Email sudah terdaftar. Silakan login atau gunakan email lain.';
+                case 'auth/weak-password': return 'Password minimal 6 karakter.';
+                case 'auth/network-request-failed': return 'Gagal terhubung. Periksa koneksi internet Anda.';
+                default: return 'Terjadi kesalahan tidak dikenal. Coba lagi. Kode: ' + error.code;
+            }
+        }
+
+        // Cek jika pengguna sudah login saat halaman dimuat
+        auth.onAuthStateChanged(user => {
+            if (user && window.location.pathname.endsWith('/index.html')) {
+                // Jika user sudah login dan sedang di halaman index.html, redirect ke dashboard
+                window.location.href = 'dashboard.html';
+            }
+            // Tidak perlu redirect jika user belum login di index.html, karena itu memang halaman login/register
+            // dan tidak perlu redirect jika user sudah login di dashboard.html (ditangani di dashboard.html sendiri)
+        });
+    </script>
+</body>
+</html>

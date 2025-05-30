@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard ArrhythME-AI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #ca7e7e;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #333;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .container {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #a00e0e;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 15px;
+        }
+        .user-info {
+            font-weight: bold;
+            color: #a00e0e;
+        }
+
+        .dashboard-nav {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            max-width: 800px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .dashboard-nav button {
+            flex: 1 1 auto;
+            min-width: 120px;
+            padding: 12px 20px;
+            background: #a00e0e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        .dashboard-nav button:hover {
+            background: #8e0c0c;
+            transform: translateY(-2px);
+        }
+        .dashboard-nav button.active {
+            background: #a00e0e;
+            box-shadow: 0 0 0 3px rgba(144, 11, 11, 0.4);
+        }
+
+        .dashboard-content {
+            background: white;
+            width: 100%;
+            max-width: 800px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: left;
+            margin-top: 20px;
+            min-height: 300px;
+        }
+        .dashboard-content h3 {
+            color: #a00e0e;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        #profile-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+        #profile-section input[type="text"],
+        #profile-section input[type="email"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        #profile-section button {
+            background: #a00e0e;
+            margin-top: 10px;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        #profile-section button:hover {
+            background: #8e0c0c;
+            transform: translateY(-2px);
+        }
+
+        #heart-rate-section .heart-rate-display {
+            font-size: 4em;
+            font-weight: bold;
+            color: #e53935;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #heart-rate-section p {
+            text-align: center;
+        }
+        #heart-rate-section button {
+            background: #a00e0e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            margin-top: 20px;
+        }
+        #heart-rate-section button:hover {
+            background: #8e0c0c;
+            transform: translateY(-2px);
+        }
+
+        #education-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        #education-section li {
+            background-color: #f5f5f5;
+            margin-bottom: 10px;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease;
+        }
+
+        #education-section li:hover {
+            transform: translateY(-3px);
+        }
+
+        #education-section h4 {
+            color: #a00e0e;
+            margin-bottom: 5px;
+            font-size: 1.3em;
+        }
+
+        #education-section p {
+            font-size: 0.95em;
+            color: #666;
+            line-height: 1.5;
+            text-align: left;
+        }
+        #education-section button {
+            margin-top: 20px;
+            width: 100%;
+            background: #a00e0e;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        #education-section button:hover {
+            background: #8e0c0c;
+            transform: translateY(-2px);
+        }
+
+        #chat-section .chat-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            min-height: 200px;
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-section .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+        #chat-section .message.user {
+            background-color: #e1ffc7;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        #chat-section .message.doctor {
+            background-color: #d1e7dd;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+        #chat-section .chat-input {
+            display: flex;
+            gap: 10px;
+        }
+        #chat-section .chat-input input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        #chat-section .chat-input button {
+            padding: 10px 15px;
+            margin-top: 0;
+            background: #a00e0e;
+            color: white;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        #chat-section .chat-input button:hover {
+            background: #8e0c0c;
+        }
+        #role-selection {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        #role-selection button {
+            padding: 10px 20px;
+            margin: 0 10px;
+            background-color: #a00e0e;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s ease, transform 0.2s ease;
+        }
+        #role-selection button:hover {
+            background-color: #8e0c0c;
+            transform: translateY(-2px);
+        }
+        #role-selection button.active-role {
+            background-color: #5c0808;
+            box-shadow: 0 0 0 3px rgba(144, 11, 11, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Selamat Datang di Dashboard ArrhythME-AI!</h1>
+        <p>Anda telah berhasil masuk.</p>
+        <p>Email Anda: <span id="user-email" class="user-info">Memuat...</span></p>
+        <p>Peran Anda: <span id="user-role" class="user-info">Memuat...</span></p>
+
+        <p>Di sini Anda dapat memantau detak jantung, melihat riwayat analisis, dan mengelola pengaturan.</p>
+        <p>Fitur-fitur canggih akan segera hadir!</p>
+
+        <div class="dashboard-nav">
+            <button id="nav-profile" class="active">Profil</button>
+            <button id="nav-heart-rate">Detak Jantung (BPM)</button>
+            <button id="nav-education">Edukasi</button>
+            <button id="nav-chat">Chat dengan Dokter</button>
+            <button id="logout-btn">Logout</button>
+        </div>
+    </div>
+
+    <div class="dashboard-content">
+        <div id="profile-section" class="content-section">
+            <h3>Profil Pengguna</h3>
+            <label for="profile-name">Nama:</label>
+            <input type="text" id="profile-name" placeholder="Masukkan Nama Lengkap" disabled>
+            <label for="profile-email">Email:</label>
+            <input type="email" id="profile-email" value="user@example.com" disabled>
+            <label for="profile-nik">NIK:</label>
+            <input type="text" id="profile-nik" placeholder="Masukkan NIK Anda" disabled>
+            <label for="profile-place-dob">Tempat, Tanggal Lahir:</label>
+            <input type="text" id="profile-place-dob" placeholder="Contoh: Jakarta, 01/01/1990" disabled>
+            <label for="profile-address">Alamat:</label>
+            <input type="text" id="profile-address" placeholder="Masukkan Alamat Lengkap" disabled>
+            <label for="profile-phone">Nomor Telepon:</label>
+            <input type="text" id="profile-phone" placeholder="Masukkan Nomor Telepon" disabled>
+            <button id="edit-profile-btn">Edit Profil</button>
+            <button id="save-profile-btn" style="display: none;">Simpan Profil</button>
+        </div>
+
+        <div id="heart-rate-section" class="content-section" style="display: none;">
+            <h3>Detak Jantung Anda (BPM)</h3>
+            <div class="heart-rate-display">-- BPM</div>
+            <p>Data detak jantung terbaru Anda akan ditampilkan di sini.</p>
+            <p>Fitur monitoring real-time akan segera tersedia.</p>
+            <button>Refresh BPM</button>
+        </div>
+
+        <div id="education-section" class="content-section" style="display: none;">
+            <h3>Pusat Edukasi Kesehatan Jantung</h3>
+            <p>Dapatkan informasi terbaru mengenai kesehatan jantung, pencegahan, dan gaya hidup sehat.</p>
+            <ul id="article-list">
+                </ul>
+            <button>Lihat Artikel Selengkapnya</button>
+        </div>
+
+        <div id="chat-section" class="content-section" style="display: none;">
+            <h3>Chat dengan Dokter</h3>
+            <div id="role-selection">
+                <button id="patient-role-btn" class="active-role">Saya Pasien</button>
+                <button id="doctor-role-btn">Saya Dokter</button>
+            </div>
+            <div class="chat-box" id="chat-messages">
+                </div>
+            <div class="chat-input">
+                <input type="text" id="chat-message-input" placeholder="Ketik pesan Anda...">
+                <button id="send-chat-btn">Kirim</button>
+            </div>
+            <p style="font-size: 0.9em; color: #888; text-align: center; margin-top: 15px;">
+                *Layanan ini untuk konsultasi awal. Untuk diagnosis, segera temui dokter.
+            </p>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Konfigurasi Firebase Anda (HARUS SESUAI DENGAN PROYEK FIREBASE ANDA)
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk", // Ganti dengan API Key Anda
+            authDomain: "arrhythme-ai-29cc8.firebaseapp.com", // Ganti dengan Auth Domain Anda
+            projectId: "arrhythme-ai-29cc8", // Ganti dengan Project ID Anda
+            storageBucket: "arrhythme-ai-29cc8.appspot.com",
+            messagingSenderId: "869423405995",
+            appId: "1:869423405995:web:d750c0530b9709029190ee"
+        };
+
+        // Inisialisasi Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Dapatkan elemen DOM
+        const userEmailSpan = document.getElementById('user-email');
+        const userRoleSpan = document.getElementById('user-role');
+        const logoutBtn = document.getElementById('logout-btn');
+
+        // Navigasi
+        const navProfileBtn = document.getElementById('nav-profile');
+        const navHeartRateBtn = document.getElementById('nav-heart-rate');
+        const navEducationBtn = document.getElementById('nav-education');
+        const navChatBtn = document.getElementById('nav-chat');
+
+        // Bagian Konten
+        const profileSection = document.getElementById('profile-section');
+        const heartRateSection = document.getElementById('heart-rate-section');
+        const educationSection = document.getElementById('education-section');
+        const chatSection = document.getElementById('chat-section');
+
+        // Elemen Profil
+        const profileNameInput = document.getElementById('profile-name');
+        const profileEmailInput = document.getElementById('profile-email');
+        const profileNikInput = document.getElementById('profile-nik');
+        const profilePlaceDobInput = document.getElementById('profile-place-dob');
+        const profileAddressInput = document.getElementById('profile-address');
+        const profilePhoneInput = document.getElementById('profile-phone');
+        const editProfileBtn = document.getElementById('edit-profile-btn');
+        const saveProfileBtn = document.getElementById('save-profile-btn');
+
+        // Elemen Edukasi
+        const articleList = document.getElementById('article-list');
+
+        // Elemen Chat
+        const chatMessagesDiv = document.getElementById('chat-messages');
+        const chatMessageInput = document.getElementById('chat-message-input');
+        const sendChatBtn = document.getElementById('send-chat-btn');
+        const patientRoleBtn = document.getElementById('patient-role-btn');
+        const doctorRoleBtn = document.getElementById('doctor-role-btn');
+
+        let currentUserRole = 'patient'; // Default role
+
+        // --- Fungsi Utama ---
+
+        function showSection(sectionToShow) {
+            const sections = [profileSection, heartRateSection, educationSection, chatSection];
+            sections.forEach(section => {
+                if (section === sectionToShow) {
+                    section.style.display = 'block';
+                } else {
+                    section.style.display = 'none';
+                }
+            });
+
+            const navButtons = document.querySelectorAll('.dashboard-nav button');
+            navButtons.forEach(btn => btn.classList.remove('active'));
+            if (sectionToShow === profileSection) navProfileBtn.classList.add('active');
+            else if (sectionToShow === heartRateSection) navHeartRateBtn.classList.add('active');
+            else if (sectionToShow === educationSection) navEducationBtn.classList.add('active');
+            else if (sectionToShow === chatSection) navChatBtn.classList.add('active');
+        }
+
+        // --- Firebase Auth & Profile Management ---
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                console.log("User logged in:", user.email);
+                userEmailSpan.textContent = user.email;
+                profileEmailInput.value = user.email;
+
+                db.collection('users').doc(user.uid).get().then(doc => {
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        console.log("User data loaded:", userData);
+                        profileNameInput.value = userData.name || '';
+                        profileNikInput.value = userData.nik || '';
+                        profilePlaceDobInput.value = userData.placeDob || '';
+                        profileAddressInput.value = userData.address || '';
+                        profilePhoneInput.value = userData.phone || '';
+                        currentUserRole = userData.role || 'patient';
+                        userRoleSpan.textContent = currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1);
+                    } else {
+                        console.log("No user data found, creating new profile with default role 'patient'.");
+                        db.collection('users').doc(user.uid).set({
+                            email: user.email,
+                            name: '',
+                            nik: '',
+                            placeDob: '',
+                            address: '',
+                            phone: '',
+                            role: 'patient'
+                        }, { merge: true }).then(() => { // Added merge: true here for creation too
+                            profileNameInput.value = '';
+                            profileNikInput.value = '';
+                            profilePlaceDobInput.value = '';
+                            profileAddressInput.value = '';
+                            profilePhoneInput.value = '';
+                            userRoleSpan.textContent = 'Patient';
+                            currentUserRole = 'patient';
+                            console.log("New user profile created successfully.");
+                        }).catch(error => {
+                            console.error("Error creating new user profile:", error);
+                            alert("Gagal membuat profil baru: " + error.message); // Added alert for new profile creation error
+                        });
+                    }
+                    updateChatInterfaceForRole();
+                    loadChatMessages();
+                }).catch(error => {
+                    console.error("Error getting user profile:", error);
+                    alert("Gagal memuat profil: " + error.message); // Added alert for loading profile error
+                });
+
+            } else {
+                console.log("No user logged in, redirecting to index.html.");
+                window.location.href = 'index.html';
+            }
+        });
+
+        logoutBtn.addEventListener('click', async () => {
+            try {
+                await auth.signOut();
+                alert('Anda telah berhasil logout.');
+                window.location.href = 'index.html';
+            } catch (error) {
+                console.error("Error during logout:", error);
+                alert("Gagal logout: " + error.message);
+            }
+        });
+
+        // Logika Edit dan Simpan Profil
+        editProfileBtn.addEventListener('click', () => {
+            console.log("Edit Profil button clicked!"); // DEBUGGING: Tambahkan ini
+            profileNameInput.disabled = false;
+            profileNikInput.disabled = false;
+            profilePlaceDobInput.disabled = false;
+            profileAddressInput.disabled = false;
+            profilePhoneInput.disabled = false;
+
+            editProfileBtn.style.display = 'none';
+            saveProfileBtn.style.display = 'inline-block';
+        });
+
+        saveProfileBtn.addEventListener('click', async () => {
+            console.log("Save Profil button clicked!"); // DEBUGGING: Tambahkan ini
+            const user = auth.currentUser;
+            if (user) {
+                const userName = profileNameInput.value.trim();
+                const userNik = profileNikInput.value.trim();
+                const userPlaceDob = profilePlaceDobInput.value.trim();
+                const userAddress = profileAddressInput.value.trim();
+                const userPhone = profilePhoneInput.value.trim();
+
+                console.log("Data to save:", { // DEBUGGING: Lihat data yang akan disimpan
+                    name: userName,
+                    email: user.email, // Email tidak perlu disimpan ulang kecuali memang berubah
+                    nik: userNik,
+                    placeDob: userPlaceDob,
+                    address: userAddress,
+                    phone: userPhone,
+                    role: currentUserRole // Pastikan peran juga disimpan
+                });
+                console.log("Current user role:", currentUserRole); // DEBUGGING: Cek nilai peran
+
+                try {
+                    await db.collection('users').doc(user.uid).set({
+                        name: userName,
+                        email: user.email, // Memasukkan email lagi untuk jaga-jaga
+                        nik: userNik,
+                        placeDob: userPlaceDob,
+                        address: userAddress,
+                        phone: userPhone,
+                        role: currentUserRole
+                    }, { merge: true });
+
+                    alert('Profil berhasil disimpan!');
+                    console.log('Profile saved successfully!');
+
+                    profileNameInput.disabled = true;
+                    profileNikInput.disabled = true;
+                    profilePlaceDobInput.disabled = true;
+                    profileAddressInput.disabled = true;
+                    profilePhoneInput.disabled = true;
+
+                    editProfileBtn.style.display = 'inline-block';
+                    saveProfileBtn.style.display = 'none';
+                } catch (error) {
+                    console.error("Error saving profile:", error); // DEBUGGING: Ini sangat penting!
+                    alert("Gagal menyimpan profil: " + error.message);
+                }
+            } else {
+                console.log("No user logged in when trying to save profile.");
+                alert("Anda harus login untuk menyimpan profil.");
+            }
+        });
+
+        // --- Education Section ---
+        const articles = [
+            {
+                title: "Apa itu Aritmia? Pelajari Lebih Lanjut tentang Jenis dan Penyebabnya",
+                content: "Aritmia adalah kondisi di mana detak jantung tidak teratur, terlalu cepat, atau terlalu lambat. Ini terjadi ketika impuls listrik yang mengoordinasikan detak jantung tidak berfungsi dengan baik. Ada berbagai jenis aritmia, termasuk fibrilasi atrium, takikardia, dan bradikardia. Penyebabnya bisa bervariasi, mulai dari penyakit jantung, tekanan darah tinggi, stres, hingga konsumsi kafein atau alkohol berlebihan. Penting untuk mengenali gejala seperti pusing, pingsan, atau nyeri dada dan segera mencari pertolongan medis."
+            },
+            {
+                title: "Tips Gaya Hidup Sehat untuk Jantung Optimal",
+                content: "Menjaga kesehatan jantung adalah kunci untuk hidup yang panjang dan berkualitas. Beberapa tips gaya hidup sehat meliputi: 1. Diet seimbang: Konsumsi buah, sayur, biji-bijian, dan protein tanpa lemak. Hindari makanan olahan, tinggi gula, dan lemak jenuh. 2. Olahraga teratur: Lakukan aktivitas fisik moderat setidaknya 150 menit per minggu. 3. Kelola stres: Cari cara sehat untuk mengatasi stres, seperti meditasi, yoga, atau hobi. 4. Tidur cukup: Pastikan Anda mendapatkan 7-9 jam tidur berkualitas setiap malam. 5. Hindari merokok dan batasi alkohol."
+            },
+            {
+                title: "Pentingnya Olahraga Teratur dan Nutrisi Seimbang",
+                content: "Olahraga teratur memperkuat otot jantung, meningkatkan sirkulasi darah, dan membantu menjaga berat badan ideal. Nutrisi seimbang menyediakan energi dan nutrisi penting yang dibutuhkan jantung untuk berfungsi optimal. Kombinasi keduanya secara signifikan mengurangi risiko penyakit jantung."
+            },
+            {
+                title: "Panduan Pertolongan Pertama untuk Serangan Jantung",
+                content: "Mengenali gejala serangan jantung dan mengetahui pertolongan pertama dapat menyelamatkan nyawa. Gejala umum meliputi nyeri dada yang menjalar ke lengan, leher, rahang, atau punggung, sesak napas, keringat dingin, mual, dan pusing. Jika Anda atau seseorang di sekitar Anda mengalami gejala ini: 1. Segera hubungi layanan darurat (misalnya, 112 atau 911). 2. Bantu orang tersebut duduk dengan nyaman. 3. Jika orang tersebut sadar dan tidak alergi, berikan tablet aspirin untuk dikunyah (jika tersedia dan sesuai). 4. Longgarkan pakaian yang ketat. 5. Tetap tenang dan tunggu bantuan medis datang."
+            }
+        ];
+
+        function loadEducationArticles() {
+            articleList.innerHTML = '';
+            articles.forEach(article => {
+                const li = document.createElement('li');
+                const h4 = document.createElement('h4');
+                const p = document.createElement('p');
+
+                h4.textContent = article.title;
+                p.textContent = article.content;
+
+                li.appendChild(h4);
+                li.appendChild(p);
+                articleList.appendChild(li);
+            });
+        }
+
+        // --- Chat Section ---
+
+        patientRoleBtn.addEventListener('click', () => {
+            currentUserRole = 'patient';
+            updateChatInterfaceForRole();
+            userRoleSpan.textContent = 'Patient';
+            saveUserRole(currentUserRole);
+            loadChatMessages();
+        });
+
+        doctorRoleBtn.addEventListener('click', () => {
+            currentUserRole = 'doctor';
+            updateChatInterfaceForRole();
+            userRoleSpan.textContent = 'Doctor';
+            saveUserRole(currentUserRole);
+            loadChatMessages();
+        });
+
+        function updateChatInterfaceForRole() {
+            if (currentUserRole === 'patient') {
+                patientRoleBtn.classList.add('active-role');
+                doctorRoleBtn.classList.remove('active-role');
+                chatMessageInput.placeholder = "Ketik pesan Anda untuk dokter...";
+                sendChatBtn.textContent = "Kirim";
+            } else if (currentUserRole === 'doctor') {
+                patientRoleBtn.classList.remove('active-role');
+                doctorRoleBtn.classList.add('active-role');
+                chatMessageInput.placeholder = "Ketik balasan Anda untuk pasien...";
+                sendChatBtn.textContent = "Balas";
+            }
+        }
+
+        async function saveUserRole(role) {
+            const user = auth.currentUser;
+            if (user) {
+                try {
+                    await db.collection('users').doc(user.uid).set({
+                        role: role
+                    }, { merge: true });
+                    console.log("User role updated to:", role);
+                } catch (error) {
+                    console.error("Error saving user role:", error);
+                }
+            }
+        }
+
+        function displayMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+
+            let senderIdentifier = '';
+            if (auth.currentUser && message.senderId === auth.currentUser.uid) {
+                messageDiv.classList.add('user');
+                messageDiv.textContent = message.text;
+            } else {
+                if (message.senderRole === 'doctor') {
+                    messageDiv.classList.add('doctor');
+                    senderIdentifier = 'Dokter';
+                } else {
+                    messageDiv.classList.add('doctor');
+                    senderIdentifier = message.senderName || message.senderEmail;
+                }
+                messageDiv.innerHTML = `<strong>${senderIdentifier}:</strong> ${message.text}`;
+            }
+            chatMessagesDiv.appendChild(messageDiv);
+        }
+
+        async function sendMessage() {
+            const messageText = chatMessageInput.value.trim();
+            const user = auth.currentUser;
+
+            if (messageText && user) {
+                const userName = profileNameInput.value.trim();
+
+                try {
+                    await db.collection('chats').add({
+                        senderId: user.uid,
+                        senderRole: currentUserRole,
+                        senderEmail: user.email,
+                        senderName: userName || user.email,
+                        text: messageText,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    chatMessageInput.value = '';
+                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                } catch (error) {
+                    console.error("Error sending message:", error);
+                    alert("Gagal mengirim pesan: " + error.message);
+                }
+            }
+        }
+
+        sendChatBtn.addEventListener('click', sendMessage);
+        chatMessageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        function loadChatMessages() {
+            chatMessagesDiv.innerHTML = '';
+            db.collection('chats').orderBy('timestamp').onSnapshot(snapshot => {
+                chatMessagesDiv.innerHTML = '';
+                snapshot.forEach(doc => {
+                    const message = doc.data();
+                    displayMessage(message);
+                });
+                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+            }, error => {
+                console.error("Error loading chat messages:", error);
+            });
+        }
+
+        // --- Inisialisasi Saat Halaman Dimuat ---
+        document.addEventListener('DOMContentLoaded', () => {
+            showSection(profileSection);
+            loadEducationArticles();
+
+            navProfileBtn.addEventListener('click', () => showSection(profileSection));
+            navHeartRateBtn.addEventListener('click', () => showSection(heartRateSection));
+            navEducationBtn.addEventListener('click', () => showSection(educationSection));
+            navChatBtn.addEventListener('click', () => showSection(chatSection));
+        });
+    </script>
+</body>
+</html>
