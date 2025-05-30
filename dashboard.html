@@ -157,6 +157,37 @@
             transform: translateY(-2px);
         }
 
+        /* Heart Rate List for Doctors */
+        #heart-rate-section #patient-bpm-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fcfcfc;
+        }
+        #heart-rate-section #patient-bpm-list li {
+            background-color: #f5f5f5;
+            margin-bottom: 8px;
+            padding: 12px;
+            border-radius: 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1em;
+        }
+        #heart-rate-section #patient-bpm-list li strong {
+            color: #333;
+        }
+        #heart-rate-section #patient-bpm-list li span {
+            color: #e53935;
+            font-weight: bold;
+        }
+
+
         #education-section ul {
             list-style: none;
             padding: 0;
@@ -236,13 +267,14 @@
             border-radius: 15px;
             max-width: 70%;
             word-wrap: break-word;
+            font-size: 0.95em;
         }
         #chat-section .message.user { /* Pesan dari user yang sedang login (baik pasien/dokter) */
             background-color: #e1ffc7;
             align-self: flex-end;
             margin-left: auto;
         }
-        #chat-section .message.doctor { /* Pesan dari dokter lain (untuk pasien) atau dari diri sendiri (untuk dokter) */
+        #chat-section .message.doctor-reply { /* Pesan dari dokter lain (untuk pasien) atau dari diri sendiri (untuk dokter) */
             background-color: #d1e7dd;
             align-self: flex-start;
             margin-right: auto;
@@ -316,6 +348,13 @@
             border-color: #a0c2a0;
             font-weight: bold;
         }
+        /* Style untuk judul chat jika dokter sudah memilih pasien */
+        #chat-section .chat-with-patient-title {
+            text-align: center;
+            font-size: 1.5em;
+            color: #a00e0e;
+            margin-bottom: 15px;
+        }
 
     </style>
 </head>
@@ -358,11 +397,16 @@
         </div>
 
         <div id="heart-rate-section" class="content-section" style="display: none;">
-            <h3>Detak Jantung Anda (BPM)</h3>
-            <div class="heart-rate-display">-- BPM</div>
-            <p>Data detak jantung terbaru Anda akan ditampilkan di sini.</p>
-            <p>Fitur monitoring real-time akan segera tersedia.</p>
-            <button>Refresh BPM</button>
+            <h3>Detak Jantung (BPM)</h3>
+            <div class="heart-rate-display" id="current-bpm-display">-- BPM</div>
+            <p id="bpm-status-message">Data detak jantung terbaru Anda akan ditampilkan di sini.</p>
+            <button id="refresh-bpm-btn">Refresh BPM</button>
+
+            <div id="doctor-bpm-view" style="display: none;">
+                <h4>Daftar Detak Jantung Pasien:</h4>
+                <ul id="patient-bpm-list">
+                    </ul>
+            </div>
         </div>
 
         <div id="education-section" class="content-section" style="display: none;">
@@ -394,13 +438,13 @@
     <script>
         // Konfigurasi Firebase Anda (HARUS SESUAI DENGAN PROYEK FIREBASE ANDA)
         const firebaseConfig = {
-           apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk",
-             authDomain: "arrhythme-ai-29cc8.firebaseapp.com",
-             databaseURL: "https://arrhythme-ai-29cc8-default-rtdb.firebaseio.com",
-             projectId: "arrhythme-ai-29cc8",
-             storageBucket: "arrhythme-ai-29cc8.firebasestorage.app",
-             messagingSenderId: "869423405995",
-             appId: "1:869423405995:web:d750c0530b9709029190ee",
+            apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk",
+            authDomain: "arrhythme-ai-29cc8.firebaseapp.com",
+            projectId: "arrhythme-ai-29cc8",
+            storageBucket: "arrhythme-ai-29cc8.firebasestorage.app",
+            messagingSenderId: "869423405995",
+            appId: "1:869423405995:web:d750c0530b9709029190ee"
+            // databaseURL: "https://arrhythme-ai-29cc8-default-rtdb.firebaseio.com", // Hapus atau komentari ini jika menggunakan Firestore
         };
 
         // Inisialisasi Firebase
@@ -435,6 +479,13 @@
         const editProfileBtn = document.getElementById('edit-profile-btn');
         const saveProfileBtn = document.getElementById('save-profile-btn');
 
+        // Elemen Heart Rate
+        const currentBpmDisplay = document.getElementById('current-bpm-display');
+        const bpmStatusMessage = document.getElementById('bpm-status-message');
+        const refreshBpmBtn = document.getElementById('refresh-bpm-btn');
+        const doctorBpmView = document.getElementById('doctor-bpm-view');
+        const patientBpmList = document.getElementById('patient-bpm-list');
+
         // Elemen Edukasi
         const articleList = document.getElementById('article-list');
 
@@ -446,6 +497,7 @@
         // Variabel global untuk peran dan chat dokter
         let currentUserRole = 'patient'; // Default role (akan di-overwrite dari Firestore)
         let selectedPatientIdForDoctor = null; // UID pasien yang sedang dilihat/dibalas dokter
+        let selectedPatientNameForDoctor = ''; // Nama pasien yang sedang dilihat/dibalas dokter
 
         // Div untuk daftar pasien (hanya untuk dokter)
         const patientListDiv = document.createElement('div');
@@ -494,22 +546,32 @@
 
                         // --- Logika Pengalihan Dashboard Berdasarkan Peran ---
                         if (currentUserRole === 'doctor') {
-                            showSection(chatSection); // Jika dokter, langsung ke Chat
-                            // Sembunyikan navigasi yang tidak relevan untuk dokter
-                            navProfileBtn.style.display = 'none';
-                            navHeartRateBtn.style.display = 'none';
-                            navEducationBtn.style.display = 'none';
+                            // Dokter
+                            showSection(chatSection); // Default ke Chat
+                            navProfileBtn.style.display = 'none'; // Sembunyikan profil untuk dokter
+                            navHeartRateBtn.style.display = 'inline-block'; // Tampilkan tombol detak jantung
+                            navEducationBtn.style.display = 'none'; // Sembunyikan edukasi untuk dokter
                             navChatBtn.classList.add('active'); // Pastikan tombol chat aktif
                             patientListDiv.style.display = 'block'; // Tampilkan daftar pasien untuk dokter
 
-                        } else { // Jika pasien
+                            doctorBpmView.style.display = 'block'; // Tampilkan bagian BPM pasien untuk dokter
+                            refreshBpmBtn.style.display = 'none'; // Sembunyikan tombol refresh BPM untuk dokter
+                            bpmStatusMessage.textContent = 'Data detak jantung semua pasien akan ditampilkan di sini.';
+                            loadPatientBPMs(); // Muat data BPM pasien
+                            loadPatientListForChat(); // Muat daftar pasien untuk chat
+                        } else {
+                            // Pasien
                             showSection(profileSection); // Default ke Profil untuk pasien
-                            // Pastikan semua tombol navigasi pasien ditampilkan
                             navProfileBtn.style.display = 'inline-block';
                             navHeartRateBtn.style.display = 'inline-block';
                             navEducationBtn.style.display = 'inline-block';
                             navChatBtn.style.display = 'inline-block';
                             patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien untuk pasien
+
+                            doctorBpmView.style.display = 'none'; // Sembunyikan bagian BPM pasien untuk pasien
+                            refreshBpmBtn.style.display = 'inline-block'; // Tampilkan tombol refresh BPM untuk pasien
+                            bpmStatusMessage.textContent = 'Data detak jantung terbaru Anda akan ditampilkan di sini.';
+                            loadPatientBPM(user.uid); // Muat BPM untuk pasien yang login
                         }
                         // --- Akhir Logika Pengalihan Dashboard ---
 
@@ -523,24 +585,30 @@
                             placeDob: '',
                             address: '',
                             phone: '',
-                            role: 'patient' // Default role jika user tidak ada di Firestore
+                            role: 'patient', // Default role jika user tidak ada di Firestore
+                            // Tambahkan field untuk BPM agar bisa diupdate
+                            bpm: null,
+                            lastBpmUpdate: null
                         }, { merge: true }).then(() => {
                             profileNameInput.value = '';
                             profileNikInput.value = '';
                             profilePlaceDobInput.value = '';
                             profileAddressInput.value = '';
                             profilePhoneInput.value = '';
-                            userRoleSpan.textContent = 'Patient';
+                            userRoleSpan.textContent = 'Pasien';
                             currentUserRole = 'patient';
                             console.log("New user profile created successfully.");
                             showSection(profileSection); // Tampilkan profil section
                             patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien
+                            doctorBpmView.style.display = 'none'; // Sembunyikan bagian BPM pasien
+                            refreshBpmBtn.style.display = 'inline-block'; // Tampilkan tombol refresh BPM
+                            bpmStatusMessage.textContent = 'Data detak jantung terbaru Anda akan ditampilkan di sini.';
+                            loadPatientBPM(user.uid); // Muat BPM untuk pasien yang login
                         }).catch(error => {
                             console.error("Error creating new user profile:", error);
                             alert("Gagal membuat profil baru: " + error.message);
                         });
                     }
-                    loadChatMessages(); // Selalu panggil ini untuk memuat pesan
                 }).catch(error => {
                     console.error("Error getting user profile:", error);
                     alert("Gagal memuat profil: " + error.message);
@@ -613,6 +681,86 @@
             }
         });
 
+        // --- Heart Rate Section (Pasien & Dokter) ---
+
+        // Fungsi untuk memperbarui BPM pasien (simulasi)
+        async function updatePatientBPM(userId) {
+            try {
+                const randomBPM = Math.floor(Math.random() * (100 - 60 + 1)) + 60; // BPM antara 60-100
+                await db.collection('users').doc(userId).update({
+                    bpm: randomBPM,
+                    lastBpmUpdate: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                if (userId === auth.currentUser.uid) { // Hanya update display jika ini BPM user yang login
+                    currentBpmDisplay.textContent = `${randomBPM} BPM`;
+                    bpmStatusMessage.textContent = `Detak jantung Anda terbaru (${new Date().toLocaleTimeString()}).`;
+                }
+                console.log(`BPM user ${userId} diperbarui menjadi ${randomBPM}`);
+            } catch (error) {
+                console.error("Error updating BPM:", error);
+                alert("Gagal memperbarui BPM: " + error.message);
+            }
+        }
+
+        // Fungsi untuk memuat BPM pasien yang sedang login
+        function loadPatientBPM(userId) {
+            db.collection('users').doc(userId).onSnapshot(doc => {
+                if (doc.exists) {
+                    const userData = doc.data();
+                    if (userData.bpm !== null) {
+                        currentBpmDisplay.textContent = `${userData.bpm} BPM`;
+                        let lastUpdate = 'Tidak diketahui';
+                        if (userData.lastBpmUpdate) {
+                            lastUpdate = userData.lastBpmUpdate.toDate().toLocaleTimeString();
+                        }
+                        bpmStatusMessage.textContent = `Detak jantung Anda terbaru (${lastUpdate}).`;
+                    } else {
+                        currentBpmDisplay.textContent = `-- BPM`;
+                        bpmStatusMessage.textContent = 'Belum ada data detak jantung. Klik "Refresh BPM" untuk simulasi.';
+                    }
+                }
+            }, error => {
+                console.error("Error loading patient BPM:", error);
+                bpmStatusMessage.textContent = 'Gagal memuat data detak jantung.';
+            });
+        }
+
+        // Fungsi untuk memuat daftar BPM semua pasien (untuk dokter)
+        function loadPatientBPMs() {
+            patientBpmList.innerHTML = ''; // Bersihkan daftar sebelumnya
+            db.collection('users')
+                .where('role', '==', 'patient')
+                .onSnapshot(snapshot => {
+                    patientBpmList.innerHTML = ''; // Bersihkan lagi untuk update real-time
+                    if (snapshot.empty) {
+                        patientBpmList.innerHTML = '<li>Belum ada data BPM dari pasien.</li>';
+                        return;
+                    }
+                    snapshot.forEach(doc => {
+                        const patientData = doc.data();
+                        const li = document.createElement('li');
+                        const bpmValue = patientData.bpm !== null ? `${patientData.bpm} BPM` : 'N/A';
+                        const lastUpdate = patientData.lastBpmUpdate ? patientData.lastBpmUpdate.toDate().toLocaleTimeString() : 'Belum ada data';
+                        li.innerHTML = `<strong>${patientData.name || patientData.email}</strong>: <span>${bpmValue}</span> (Update: ${lastUpdate})`;
+                        patientBpmList.appendChild(li);
+                    });
+                }, error => {
+                    console.error("Error loading all patient BPMs:", error);
+                    patientBpmList.innerHTML = '<li>Gagal memuat data BPM pasien.</li>';
+                });
+        }
+
+
+        refreshBpmBtn.addEventListener('click', () => {
+            const user = auth.currentUser;
+            if (user && currentUserRole === 'patient') {
+                updatePatientBPM(user.uid);
+            } else {
+                alert("Tombol ini untuk pasien untuk memperbarui BPM mereka (simulasi).");
+            }
+        });
+
+
         // --- Education Section ---
         const articles = [
             {
@@ -661,21 +809,23 @@
 
         // --- Chat Section ---
 
-        function displayMessage(message) {
+        // Unsubscribe function for real-time listener
+        let unsubscribeChatListener = null;
+
+        function displayMessage(message, currentUserId) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
 
-            if (auth.currentUser && message.senderId === auth.currentUser.uid) {
-                messageDiv.classList.add('user'); // Pesan dari user yang sedang login
+            // Determine message sender role for styling
+            if (message.senderId === currentUserId) {
+                messageDiv.classList.add('user'); // Pesan dari user yang sedang login (baik pasien/dokter)
                 messageDiv.textContent = message.text;
-            } else {
-                if (message.senderRole === 'doctor') {
-                    messageDiv.classList.add('doctor'); // Pesan dari dokter lain (untuk pasien)
-                    messageDiv.innerHTML = `<strong>Dokter ${message.senderName || message.senderEmail}:</strong> ${message.text}`;
-                } else {
-                    messageDiv.classList.add('patient-other'); // Pesan dari pasien lain (untuk tampilan dokter)
-                    messageDiv.innerHTML = `<strong>Pasien ${message.senderName || message.senderEmail}:</strong> ${message.text}`;
-                }
+            } else if (message.senderRole === 'doctor') {
+                messageDiv.classList.add('doctor-reply'); // Pesan dari dokter (untuk pasien)
+                messageDiv.innerHTML = `<strong>Dokter ${message.senderName || message.senderEmail}:</strong> ${message.text}`;
+            } else if (message.senderRole === 'patient') {
+                messageDiv.classList.add('patient-other'); // Pesan dari pasien lain (untuk tampilan dokter)
+                messageDiv.innerHTML = `<strong>Pasien ${message.senderName || message.senderEmail}:</strong> ${message.text}`;
             }
             chatMessagesDiv.appendChild(messageDiv);
         }
@@ -699,21 +849,20 @@
                     senderName: userName,
                     text: messageText,
                     timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    type: userRole === 'patient' ? 'general_consultation' : 'doctor_reply',
                     // Untuk pasien, originalPatientId adalah UID mereka sendiri
                     // Untuk dokter, originalPatientId adalah UID pasien yang sedang mereka balas (selectedPatientIdForDoctor)
-                    // Jika dokter belum memilih pasien, originalPatientId akan menjadi UID dokter itu sendiri (fallback)
-                    originalPatientId: userRole === 'patient' ? user.uid : (selectedPatientIdForDoctor || user.uid)
+                    originalPatientId: userRole === 'patient' ? user.uid : (selectedPatientIdForDoctor)
                 };
+
+                // Validasi tambahan untuk dokter: harus memilih pasien
+                if (userRole === 'doctor' && !selectedPatientIdForDoctor) {
+                    alert('Dokter harus memilih pasien dari daftar untuk memulai atau melanjutkan chat.');
+                    return;
+                }
 
                 await db.collection('chats').add(chatData);
                 chatMessageInput.value = '';
-                chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-
-                // Jika dokter mengirim pesan, dan belum ada pasien terpilih,
-                // mungkin perlu me-refresh daftar pasien atau menandai chat ini.
-                // Untuk kesederhanaan, ini akan ditangani oleh loadChatMessages berikutnya.
-
+                // Scroll akan otomatis jika onSnapshot terpicu
             } catch (error) {
                 console.error("Error sending message:", error);
                 alert("Gagal mengirim pesan: " + error.message);
@@ -727,104 +876,125 @@
             }
         });
 
-        function loadChatMessages() {
-            chatMessagesDiv.innerHTML = ''; // Kosongkan chat sebelumnya
-            patientListDiv.innerHTML = ''; // Kosongkan daftar pasien
 
-            if (currentUserRole === 'patient') {
-                patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien untuk pasien
-                // Pasien hanya melihat pesan yang `originalPatientId`-nya adalah UID mereka
-                db.collection('chats')
-                    .where('originalPatientId', '==', auth.currentUser.uid)
-                    .orderBy('timestamp')
-                    .onSnapshot(snapshot => {
-                        chatMessagesDiv.innerHTML = ''; // Kosongkan lagi untuk update real-time
-                        snapshot.forEach(doc => {
-                            const message = doc.data();
-                            displayMessage(message);
-                        });
-                        chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-                    }, error => {
-                        console.error("Error loading patient's chat messages:", error);
+        // Fungsi untuk memuat pesan chat yang spesifik (dipanggil oleh pasien atau dokter setelah memilih pasien)
+        function loadSpecificChat(targetPatientId, targetPatientName) {
+            // Hentikan listener sebelumnya jika ada
+            if (unsubscribeChatListener) {
+                unsubscribeChatListener();
+                console.log("Previous chat listener unsubscribed.");
+            }
+
+            chatMessagesDiv.innerHTML = `<h4 class="chat-with-patient-title">Chat dengan ${targetPatientName || 'Pasien'}</h4>`; // Kosongkan chat dan beri judul
+            selectedPatientIdForDoctor = targetPatientId; // Update ID pasien yang dipilih
+
+            unsubscribeChatListener = db.collection('chats')
+                .where('originalPatientId', '==', targetPatientId)
+                .orderBy('timestamp')
+                .onSnapshot(snapshot => {
+                    chatMessagesDiv.innerHTML = `<h4 class="chat-with-patient-title">Chat dengan ${targetPatientName || 'Pasien'}</h4>`; // Kosongkan lagi untuk update real-time
+                    snapshot.forEach(doc => {
+                        const message = doc.data();
+                        displayMessage(message, auth.currentUser.uid); // Pass current user's UID for styling
                     });
+                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                }, error => {
+                    console.error("Error loading specific chat messages:", error);
+                    chatMessagesDiv.innerHTML = `<p style="text-align: center; color: red;">Gagal memuat chat.</p>`;
+                });
+        }
 
-            } else if (currentUserRole === 'doctor') {
-                patientListDiv.style.display = 'block';
-                chatMessagesDiv.innerHTML = '<h3>Pilih pasien dari daftar di atas untuk melihat chat.</h3>'; // Pesan awal untuk dokter
 
-                // Dokter akan melihat semua pasien yang sudah mengirim pesan
-                db.collection('chats')
-                    .where('senderRole', '==', 'patient') // Hanya ambil pesan yang dikirim pasien
-                    .orderBy('timestamp', 'desc') // Ambil yang terbaru dulu
-                    .get() // Gunakan get() sekali untuk mendapatkan daftar pasien unik
-                    .then(snapshot => {
-                        const patients = new Map(); // Menggunakan Map untuk menyimpan pasien unik
-                        snapshot.forEach(doc => {
-                            const msg = doc.data();
-                            // Jika pesan ini bukan dari dokter itu sendiri dan punya originalPatientId
-                            if (msg.senderRole === 'patient' && msg.originalPatientId) {
-                                patients.set(msg.originalPatientId, {
-                                    id: msg.originalPatientId,
-                                    name: msg.senderName,
-                                    email: msg.senderEmail
-                                });
-                            }
-                        });
-
-                        if (patients.size === 0) {
-                            patientListDiv.innerHTML = '<p>Belum ada pasien yang memulai chat.</p>';
-                        } else {
-                            patientListDiv.innerHTML = '<h4>Daftar Chat Pasien:</h4>';
-                            patients.forEach(patient => {
-                                const patientButton = document.createElement('button');
-                                patientButton.textContent = `Chat dengan ${patient.name || patient.email}`;
-                                patientButton.dataset.patientId = patient.id; // Simpan UID pasien di data-attribute
-
-                                patientButton.addEventListener('click', () => {
-                                    selectedPatientIdForDoctor = patient.id;
-                                    // Hapus highlight dari semua tombol pasien
-                                    document.querySelectorAll('#patient-list-container button').forEach(btn => {
-                                        btn.classList.remove('active-patient');
-                                    });
-                                    // Tambahkan highlight ke tombol yang sedang diklik
-                                    patientButton.classList.add('active-patient');
-
-                                    // Mulai mendengarkan pesan hanya untuk pasien yang dipilih
-                                    db.collection('chats')
-                                        .where('originalPatientId', '==', selectedPatientIdForDoctor)
-                                        .orderBy('timestamp')
-                                        .onSnapshot(snapshot => {
-                                            chatMessagesDiv.innerHTML = `<h4 style="text-align: center;">Chat dengan ${patient.name || patient.email}</h4>`;
-                                            snapshot.forEach(doc => {
-                                                const message = doc.data();
-                                                displayMessage(message);
-                                            });
-                                            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-                                        }, error => {
-                                            console.error("Error loading specific patient chat messages:", error);
-                                        });
-                                });
-                                patientListDiv.appendChild(patientButton);
+        // Fungsi untuk memuat daftar pasien untuk dokter
+        function loadPatientListForChat() {
+            patientListDiv.innerHTML = '<h4>Daftar Chat Pasien:</h4>';
+            // Dapatkan semua pasien yang pernah mengirim pesan
+            db.collection('chats')
+                .where('senderRole', '==', 'patient')
+                .get() // Menggunakan get() untuk daftar pasien, bukan onSnapshot
+                .then(snapshot => {
+                    const uniquePatients = new Map();
+                    snapshot.forEach(doc => {
+                        const message = doc.data();
+                        if (message.originalPatientId && !uniquePatients.has(message.originalPatientId)) {
+                            uniquePatients.set(message.originalPatientId, {
+                                id: message.originalPatientId,
+                                name: message.senderName,
+                                email: message.senderEmail
                             });
                         }
-                    })
-                    .catch(error => {
-                        console.error("Error getting patient list for doctor:", error);
                     });
-            }
+
+                    if (uniquePatients.size === 0) {
+                        patientListDiv.innerHTML = '<p>Belum ada pasien yang memulai chat.</p>';
+                        // Sembunyikan input chat jika tidak ada pasien
+                        chatMessageInput.disabled = true;
+                        sendChatBtn.disabled = true;
+                    } else {
+                        uniquePatients.forEach(patient => {
+                            const patientButton = document.createElement('button');
+                            patientButton.textContent = `Chat dengan ${patient.name || patient.email}`;
+                            patientButton.dataset.patientId = patient.id;
+                            patientButton.dataset.patientName = patient.name || patient.email; // Simpan nama untuk judul
+
+                            patientButton.addEventListener('click', function() {
+                                // Hapus highlight dari semua tombol pasien
+                                document.querySelectorAll('#patient-list-container button').forEach(btn => {
+                                    btn.classList.remove('active-patient');
+                                });
+                                // Tambahkan highlight ke tombol yang sedang diklik
+                                this.classList.add('active-patient');
+
+                                selectedPatientIdForDoctor = patient.id; // Set ID pasien yang dipilih
+                                selectedPatientNameForDoctor = patient.name || patient.email; // Set nama pasien yang dipilih
+
+                                // Aktifkan input chat
+                                chatMessageInput.disabled = false;
+                                sendChatBtn.disabled = false;
+
+                                // Muat chat spesifik pasien ini
+                                loadSpecificChat(selectedPatientIdForDoctor, selectedPatientNameForDoctor);
+                            });
+                            patientListDiv.appendChild(patientButton);
+                        });
+                        // Pada awalnya, chat input dinonaktifkan sampai dokter memilih pasien
+                        chatMessageInput.disabled = true;
+                        sendChatBtn.disabled = true;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading patient list for chat:", error);
+                    patientListDiv.innerHTML = '<p>Gagal memuat daftar pasien.</p>';
+                });
         }
 
 
         // --- Inisialisasi Saat Halaman Dimuat ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Peran akan ditentukan oleh auth.onAuthStateChanged, yang akan memanggil showSection
-            // jadi tidak perlu panggil showSection(profileSection) secara langsung di sini.
             loadEducationArticles(); // Muat artikel edukasi
 
             navProfileBtn.addEventListener('click', () => showSection(profileSection));
             navHeartRateBtn.addEventListener('click', () => showSection(heartRateSection));
             navEducationBtn.addEventListener('click', () => showSection(educationSection));
-            navChatBtn.addEventListener('click', () => showSection(chatSection));
+            navChatBtn.addEventListener('click', () => {
+                showSection(chatSection);
+                if (currentUserRole === 'doctor') {
+                    // Jika dokter mengklik tab chat, muat ulang daftar pasien jika belum ada yang dipilih
+                    if (!selectedPatientIdForDoctor) {
+                        loadPatientListForChat();
+                        chatMessagesDiv.innerHTML = '<h3>Pilih pasien dari daftar di atas untuk melihat chat.</h3>'; // Pesan awal untuk dokter
+                    }
+                } else {
+                    // Pasien selalu langsung memuat chat mereka sendiri
+                    // Perlu memastikan user.uid tersedia, ini akan aman karena onAuthStateChanged sudah memeriksa user
+                    // Perlu juga nama user untuk judul chat
+                    if (auth.currentUser) {
+                        loadSpecificChat(auth.currentUser.uid, profileNameInput.value.trim() || 'Anda');
+                    } else {
+                        chatMessagesDiv.innerHTML = '<h3>Harap login untuk menggunakan fitur chat.</h3>';
+                    }
+                }
+            });
         });
     </script>
 </body>
