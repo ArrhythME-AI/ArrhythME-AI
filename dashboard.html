@@ -4,95 +4,198 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard ArrhythME-AI</title>
-    <style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
         body {
-            font-family: 'Segoe UI', sans-serif;
-            background: #ca7e7e;
+            font-family: 'Poppins', sans-serif;
+            background: #ca7e7e; /* Warna latar belakang */
             display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
+            justify-content: center;
+            align-items: flex-start; /* Mengatur item dari atas */
             min-height: 100vh;
             margin: 0;
             color: #333;
-            padding: 20px;
-            box-sizing: border-box;
+            padding: 18px; /* Padding di sekitar body */
+            box-sizing: border-box; /* Memastikan padding tidak menambah ukuran */
         }
-        .container {
+
+        .dashboard-container {
+            display: flex;
             background: white;
-            width: 100%;
-            max-width: 800px;
-            padding: 40px;
-            border-radius: 15px;
+            border-radius: 17px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        h1 {
-            color: #a00e0e;
-            margin-bottom: 20px;
-        }
-        p {
-            font-size: 1.1em;
-            color: #555;
-            margin-bottom: 15px;
-        }
-        .user-info {
-            font-weight: bold;
-            color: #a00e0e;
+            width: 100%;
+            max-width: 1200px; /* Lebar maksimum dashboard */
+            min-height: 80vh; /* Tinggi minimum dashboard */
+            overflow: hidden; /* Pastikan konten tidak meluber */
         }
 
         .dashboard-nav {
+            width: 250px; /* Lebar navigasi samping */
+            background: #a00e0e; /* Warna navigasi */
+            padding: 30px 20px;
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-            margin-bottom: 30px;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            max-width: 800px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .dashboard-nav button {
-            flex: 1 1 auto;
-            min-width: 120px;
-            padding: 12px 20px;
-            background: #a00e0e;
+            flex-direction: column;
+            align-items: center;
             color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-        .dashboard-nav button:hover {
-            background: #8e0c0c;
-            transform: translateY(-2px);
-        }
-        .dashboard-nav button.active {
-            background: #a00e0e;
-            box-shadow: 0 0 0 3px rgba(144, 11, 11, 0.4);
+            box-sizing: border-box;
+            position: relative; /* Untuk corner-logo */
         }
 
-        .dashboard-content {
-            background: white;
-            width: 100%;
-            max-width: 800px;
-            padding: 40px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            text-align: left;
-            margin-top: 20px;
-            min-height: 300px;
+        .dashboard-nav .corner-logo {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: auto;
+            z-index: 10;
         }
-        .dashboard-content h3 {
+
+        .dashboard-nav .profile-summary {
+            text-align: center;
+            margin-bottom: 40px;
+            margin-top: 50px; /* Memberi ruang di bawah logo pojok */
+        }
+
+        .dashboard-nav .profile-summary h1 {
+            font-size: 1.5em;
+        }
+
+        .dashboard-nav .profile-summary img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #eee;
+            border: 3px solid white;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-nav .profile-summary p {
+            margin: 5px 0;
+            font-size: 1em;
+        }
+
+        .welcome-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-bottom: 35px;
+        }
+
+        .heart-img {
+            width: 200px;
+            height: auto;
+    }
+
+        .dashboard-nav .profile-summary .user-role {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .dashboard-nav button {
+            background: none;
+            border: none;
+            color: white;
+            padding: 15px 20px;
+            margin: 5px 0;
+            width: 100%;
+            text-align: left;
+            font-size: 1.1em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background 0.3s, color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+
+        .dashboard-nav button i {
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+
+        .dashboard-nav button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dashboard-nav button.active {
+            background: white;
             color: #a00e0e;
-            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .dashboard-nav .logout-btn {
+            background: #ff5252;
+            margin-top: auto; /* Dorong ke bawah */
+            border-radius: 8px;
+            text-align: center;
+            justify-content: center; /* Pusatkan teks dan ikon */
+            padding: 15px 0;
+            font-size: 1.1em;
+            color: white;
+        }
+
+        .dashboard-nav .logout-btn:hover {
+            background: #e04040;
+        }
+
+        .dashboard-main-content {
+            flex-grow: 1;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+            overflow-y: auto; 
+        }
+
+        .dashboard-content-sections .content-section {
+            display: none; 
+            width: 100%;
+            max-width: 800px; 
+            margin: 0 auto; 
+        }
+
+        .dashboard-content-sections .content-section.active {
+            display: block; 
+        }
+
+        .header-info {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header-info h1 {
+            color: #a00e0e;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .header-info p {
+            font-size: 1.1em;
+            color: #555;
+            margin: 5px 0;
+        }
+
+        .user-info {
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Styling untuk Profil Pengguna */
+        #profile-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        #profile-section h3 {
+            color: #a00e0e;
+            margin-bottom: 25px;
             font-size: 1.8em;
             text-align: center;
         }
@@ -101,350 +204,568 @@
             display: block;
             margin-bottom: 8px;
             font-weight: bold;
-            color: #333;
+            color: #444;
+            font-size: 0.95em;
         }
+
         #profile-section input[type="text"],
         #profile-section input[type="email"] {
-            width: calc(100% - 22px);
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
             font-size: 1em;
+            box-sizing: border-box;
         }
+
+        #profile-section input:disabled {
+            background-color: #f0f0f0;
+            color: #666;
+        }
+
         #profile-section button {
             background: #a00e0e;
-            margin-top: 10px;
             color: white;
+            padding: 12px 25px;
             border: none;
-            padding: 10px 20px;
             border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: background 0.3s;
         }
+
         #profile-section button:hover {
-            background: #8e0c0c;
-            transform: translateY(-2px);
+            background: #8c1c1c;
         }
 
-        #heart-rate-section .heart-rate-display {
-            font-size: 4em;
-            font-weight: bold;
-            color: #e53935;
-            margin-top: 30px;
-            margin-bottom: 20px;
-            text-align: center;
+        #profile-section #save-profile-btn {
+            background: #28a745;
         }
-        #heart-rate-section p {
-            text-align: center;
+
+        #profile-section #save-profile-btn:hover {
+            background: #218838;
         }
-        #heart-rate-section button {
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-icon {
             background: #a00e0e;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-            margin-top: 20px;
-        }
-        #heart-rate-section button:hover {
-            background: #8e0c0c;
-            transform: translateY(-2px);
+            border-radius: 50%;
+            padding: 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
         }
 
-        /* Heart Rate List for Doctors */
-        #heart-rate-section #patient-bpm-list {
+        .profile-icon i {
+            color: white;
+            font-size: 2em;
+        }
+        
+        /* Styling untuk Detak Jantung (BPM) */
+        #heart-rate-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+
+        #heart-rate-section h3 {
+            color: #a00e0e;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .heart-rate-display {
+            font-size: 3.5em;
+            font-weight: bold;
+            color: #a00e0e;
+            margin-bottom: 20px;
+            background: #ffebeb;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block; /* Agar background sesuai teks */
+        }
+
+        #bpm-status-message {
+            color: #555;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        #refresh-bpm-btn {
+            background: #007bff;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        #refresh-bpm-btn:hover {
+            background: #0056b3;
+        }
+
+        #doctor-bpm-view {
+            margin-top: 30px;
+            text-align: left;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        #doctor-bpm-view h4 {
+            color: #a00e0e;
+            margin-bottom: 15px;
+        }
+
+        #patient-bpm-list {
             list-style: none;
             padding: 0;
-            margin-top: 20px;
-            max-height: 300px;
+            max-height: 300px; /* Batasi tinggi untuk scrolling */
             overflow-y: auto;
             border: 1px solid #eee;
             border-radius: 8px;
-            padding: 15px;
-            background-color: #fcfcfc;
         }
-        #heart-rate-section #patient-bpm-list li {
-            background-color: #f5f5f5;
-            margin-bottom: 8px;
-            padding: 12px;
-            border-radius: 6px;
+
+        #patient-bpm-list li {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 1.1em;
+            background: #fdfdfd;
         }
-        #heart-rate-section #patient-bpm-list li strong {
+
+        #patient-bpm-list li:last-child {
+            border-bottom: none;
+        }
+
+        #patient-bpm-list li strong {
             color: #333;
         }
-        #heart-rate-section #patient-bpm-list li span {
-            color: #e53935;
-            font-weight: bold;
+
+        #patient-bpm-list li span {
+            color: #666;
+            font-size: 0.9em;
         }
 
+        /* Styling untuk Edukasi */
+        #education-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
 
-        #education-section ul {
+        #education-section h3 {
+            color: #a00e0e;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
+        }
+
+        #education-section p {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #555;
+        }
+
+        #article-list {
             list-style: none;
             padding: 0;
         }
 
-        #education-section li {
-            background-color: #f5f5f5;
-            margin-bottom: 10px;
-            padding: 15px;
+        .article-item {
+            background: #f9f9f9;
+            border: 1px solid #eee;
             border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease;
+            margin-bottom: 20px;
+            padding: 20px;
+            text-align: left;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        #education-section li:hover {
-            transform: translateY(-3px);
+        .article-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
         }
 
-        #education-section h4 {
+        .article-item h4 {
             color: #a00e0e;
-            margin-bottom: 5px;
+            margin-top: 0;
+            margin-bottom: 10px;
             font-size: 1.3em;
         }
 
-        #education-section p {
+        .article-item p {
             font-size: 0.95em;
             color: #666;
-            line-height: 1.5;
-            text-align: left;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            text-align: left; /* Override p global */
         }
-        /* Tambahan untuk link artikel */
-        #education-section .article-link {
-            display: block;
-            margin-top: 10px;
+
+        .article-item a {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
+            display: inline-block;
+            margin-top: 10px;
         }
-        #education-section .article-link:hover {
+
+        .article-item a:hover {
             text-decoration: underline;
         }
 
-        #education-section button {
-            margin-top: 20px;
-            width: 100%;
-            background: #a00e0e;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.3s ease, transform 0.2s ease;
-        }
-        #education-section button:hover {
-            background: #8e0c0c;
-            transform: translateY(-2px);
-        }
-
-        /* Chat Section Styling */
-        #chat-section .chat-box {
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            min-height: 200px;
-            max-height: 300px;
-            overflow-y: auto;
-            padding: 15px;
-            margin-bottom: 15px;
-            background-color: #f9f9f9;
+        /* Styling untuk Chat */
+        #chat-section {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
+            height: 100%; /* Agar mengisi ruang yang tersedia */
         }
-        #chat-section .message {
-            margin-bottom: 10px;
-            padding: 8px 12px;
-            border-radius: 15px;
-            max-width: 70%;
-            word-wrap: break-word;
-            font-size: 0.95em;
+
+        #chat-section h3 {
+            color: #a00e0e;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            text-align: center;
         }
-        #chat-section .message.user { /* Pesan dari user yang sedang login (baik pasien/dokter) */
-            background-color: #e1ffc7;
-            align-self: flex-end;
-            margin-left: auto;
-        }
-        #chat-section .message.doctor-reply { /* Pesan dari dokter lain (untuk pasien) atau dari diri sendiri (untuk dokter) */
-            background-color: #d1e7dd;
-            align-self: flex-start;
-            margin-right: auto;
-        }
-        #chat-section .message.patient-other { /* Pesan dari pasien lain (untuk tampilan dokter) */
-            background-color: #f0f8ff;
-            align-self: flex-start;
-            margin-right: auto;
-        }
-        #chat-section .chat-input {
-            display: flex;
-            gap: 10px;
-        }
-        #chat-section .chat-input input {
-            flex-grow: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        #chat-section .chat-input button {
-            padding: 10px 15px;
-            margin-top: 0;
-            background: #a00e0e;
-            color: white;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        #chat-section .chat-input button:hover {
-            background: #8e0c0c;
-        }
-        /* Styling untuk daftar pasien (khusus dokter) */
+
         #patient-list-container {
-            margin-top: 20px;
-            margin-bottom: 20px;
-            text-align: left;
-            max-height: 180px; /* Batasi tinggi untuk scroll */
+            max-height: 200px; /* Tinggi maksimum daftar pasien */
             overflow-y: auto;
             border: 1px solid #eee;
             border-radius: 8px;
-            padding: 15px;
-            background-color: #fcfcfc;
+            margin-bottom: 20px;
         }
 
-        #patient-list-container h4 {
-            color: #a00e0e;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        #patient-list-container button {
-            background-color: #f5f5f5;
-            color: #333;
-            border: 1px solid #ddd;
+        .patient-item {
             padding: 12px 15px;
-            border-radius: 8px;
-            font-size: 1em;
-            width: 100%;
-            text-align: left;
-            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
             cursor: pointer;
-            transition: background-color 0.3s ease, border-color 0.3s ease;
+            background: #fdfdfd;
+            transition: background 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        #patient-list-container button:hover {
-            background-color: #e0e0e0;
-            border-color: #c0c0c0;
+        .patient-item:last-child {
+            border-bottom: none;
         }
-        #patient-list-container button.active-patient {
-            background-color: #d1e7dd; /* Highlight the selected patient */
-            border-color: #a0c2a0;
+
+        .patient-item:hover {
+            background: #f0f0f0;
+        }
+
+        .patient-item.selected {
+            background: #e0f7fa;
             font-weight: bold;
         }
-        /* Style untuk judul chat jika dokter sudah memilih pasien */
-        #chat-section .chat-with-patient-title {
-            text-align: center;
-            font-size: 1.5em;
+
+        .chat-with-patient-title {
             color: #a00e0e;
             margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.2em;
         }
 
+        .chat-box {
+            flex-grow: 1; 
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            background: #fcfcfc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.sent {
+            background: #a00e0e;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+        .message.received {
+            background: #e0e0e0;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message .sender-name {
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-bottom: 3px;
+            color: rgba(255, 255, 255, 0.8); 
+        }
+        .message.received .sender-name {
+            color: #555;
+        }
+
+        .message .timestamp {
+            font-size: 0.7em;
+            color: rgba(255, 255, 255, 0.6); 
+            text-align: right;
+            margin-top: 5px;
+            display: block;
+        }
+        .message.received .timestamp {
+            color: #777;
+        }
+
+        .chat-input {
+            display: flex;
+            margin-top: auto; 
+        }
+
+        .chat-input input[type="text"] {
+            flex-grow: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-right: 10px;
+            font-size: 1em;
+        }
+
+        .chat-input button {
+            background: #a00e0e;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background 0.3s;
+        }
+
+        .chat-input button:hover {
+            background: #8c1c1c;
+        }
+
+        /* Responsiveness */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+                min-height: unset;
+                max-width: 95%;
+            }
+
+            .dashboard-nav {
+                width: 100%;
+                padding: 20px 10px;
+                flex-direction: row; 
+                justify-content: space-around;
+                flex-wrap: wrap; 
+                border-bottom: 1px solid rgba(255,255,255,0.2);
+            }
+
+            .dashboard-nav .corner-logo {
+                position: static; /* Hilangkan posisi absolut */
+                margin-bottom: 10px; /* Jarak dengan elemen lain */
+                width: 40px;
+                order: -1; /* Pindahkan ke awal */
+            }
+
+            .dashboard-nav .profile-summary {
+                display: none; /* Sembunyikan ringkasan profil di mobile */
+            }
+
+            .dashboard-nav button {
+                width: auto;
+                padding: 10px 15px;
+                font-size: 0.9em;
+                margin: 5px;
+                flex-grow: 1; /* Biarkan tombol tumbuh */
+                justify-content: center;
+                align-items: center;
+            }
+
+            .dashboard-nav button i {
+                margin-right: 8px;
+                font-size: 1em;
+            }
+
+            .dashboard-nav .logout-btn {
+                width: auto;
+                margin-top: 10px;
+                flex-grow: 1;
+                font-size: 0.9em;
+            }
+
+            .dashboard-main-content {
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            #profile-section,
+            #heart-rate-section,
+            #education-section,
+            #chat-section {
+                padding: 20px;
+            }
+
+            .header-info h1 {
+                font-size: 2.5em;
+            }
+
+            .heart-rate-display {
+                font-size: 2.5em;
+            }
+
+            .chat-input {
+                flex-direction: column;
+            }
+
+            .chat-input input[type="text"] {
+                margin-right: 0;
+                margin-bottom: 10px;
+                width: 100%;
+            }
+
+            .chat-input button {
+                width: 100%;
+            }
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Selamat Datang di Dashboard ArrhythME-AI!</h1>
-        <p>Anda telah berhasil masuk.</p>
-        <p>Email Anda: <span id="user-email" class="user-info">Memuat...</span></p>
-        <p>Peran Anda: <span id="user-role" class="user-info">Memuat...</span></p>
-
-        <p>Di sini Anda dapat memantau detak jantung, melihat riwayat analisis, dan mengelola pengaturan.</p>
-        <p>Fitur-fitur canggih akan segera hadir!</p>
-
+    <div class="dashboard-container">
         <div class="dashboard-nav">
-            <button id="nav-profile" class="active">Profil</button>
-            <button id="nav-heart-rate">Detak Jantung (BPM)</button>
-            <button id="nav-education">Edukasi</button>
-            <button id="nav-chat">Chat dengan Dokter</button>
-            <button id="logout-btn">Logout</button>
-        </div>
-    </div>
-
-    <div class="dashboard-content">
-        <div id="profile-section" class="content-section">
-            <h3>Profil Pengguna</h3>
-            <label for="profile-name">Nama:</label>
-            <input type="text" id="profile-name" placeholder="Masukkan Nama Lengkap" disabled>
-            <label for="profile-email">Email:</label>
-            <input type="email" id="profile-email" value="user@example.com" disabled>
-            <label for="profile-nik">NIK:</label>
-            <input type="text" id="profile-nik" placeholder="Masukkan NIK Anda" disabled>
-            <label for="profile-place-dob">Tempat, Tanggal Lahir:</label>
-            <input type="text" id="profile-place-dob" placeholder="Contoh: Jakarta, 01/01/1990" disabled>
-            <label for="profile-address">Alamat:</label>
-            <input type="text" id="profile-address" placeholder="Masukkan Alamat Lengkap" disabled>
-            <label for="profile-phone">Nomor Telepon:</label>
-            <input type="text" id="profile-phone" placeholder="Masukkan Nomor Telepon" disabled>
-            <button id="edit-profile-btn">Edit Profil</button>
-            <button id="save-profile-btn" style="display: none;">Simpan Profil</button>
-        </div>
-
-        <div id="heart-rate-section" class="content-section" style="display: none;">
-            <h3>Detak Jantung (BPM)</h3>
-            <div class="heart-rate-display" id="current-bpm-display">-- BPM</div>
-            <p id="bpm-status-message">Data detak jantung terbaru Anda akan ditampilkan di sini.</p>
-            <button id="refresh-bpm-btn">Refresh BPM</button>
-
-            <div id="doctor-bpm-view" style="display: none;">
-                <h4>Daftar Detak Jantung Pasien:</h4>
-                <ul id="patient-bpm-list">
-                    </ul>
+            <img src="image/imagesnode-4.png.jpg" alt="Mini Logo" class="corner-logo">
+            
+            <div class="profile-summary">
+                <h1>ArrhythME-AI</h1>
+                <img src="image/LOGO.png" alt="Profile Picture">
+                <p>Welcome, <span id="nav-user-email">Memuat...</span></p>
+                <p class="user-role" id="nav-user-role">Memuat...</p>
             </div>
+
+            <button id="nav-profile" class="active"><i class="fas fa-user-alt"></i> Profil</button>
+            <button id="nav-heart-rate"><i class="fas fa-heartbeat"></i> Detak Jantung</button>
+            <button id="nav-education"><i class="fas fa-book"></i> Edukasi</button>
+            <button id="nav-chat"><i class="fas fa-comments"></i> Layanan Chat</button>
+            
+            <button id="logout-btn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
         </div>
 
-        <div id="education-section" class="content-section" style="display: none;">
-            <h3>Pusat Edukasi Kesehatan Jantung</h3>
-            <p>Dapatkan informasi terbaru mengenai kesehatan jantung, pencegahan, dan gaya hidup sehat.</p>
-            <ul id="article-list">
-                </ul>
-            <button>Lihat Artikel Selengkapnya</button>
-        </div>
-
-        <div id="chat-section" class="content-section" style="display: none;">
-            <h3>Chat dengan Dokter</h3>
-            <div class="chat-box" id="chat-messages">
+        <div class="dashboard-main-content">
+            <div class="welcome-container">
+                <img src="image/jantung.gif" alt="Heart Animation" class="heart-img" />
+                <div class="header-info">
+                    <h1>Selamat Datang di Dashboard</h1>
+                    <h1>ArrhythME-AI!</h1>
+                    <p>Email Anda: <span id="user-email-home" class="user-info">Memuat...</span></p>
+                    <p>Peran Anda: <span id="user-role-home" class="user-info">Memuat...</span></p>
+                    <p>Di sini Anda dapat memantau detak jantung, melihat riwayat analisis, dan mengelola pengaturan.</p>
+                    <p>Fitur-fitur canggih akan segera hadir!</p>
                 </div>
-            <div class="chat-input">
-                <input type="text" id="chat-message-input" placeholder="Ketik pesan Anda...">
-                <button id="send-chat-btn">Kirim</button>
             </div>
-            <p style="font-size: 0.9em; color: #888; text-align: center; margin-top: 15px;">
-                *Layanan ini untuk konsultasi awal. Untuk diagnosis, segera temui dokter.
-            </p>
+                <p style="text-align: center; color: #666; margin-top: 35px;">
+                Silakan pilih menu di samping untuk melanjutkan.
+                </p>
+
+                </div>
+                <div id="profile-section" class="content-section">
+                    <div class="profile-header">
+                        <div class="profile-icon">
+                            <i class="fas fa-user-alt"></i>
+                        </div>
+                        <h3>Profil Pengguna</h3>
+                    </div>
+                    <label for="profile-name">Nama:</label>
+                    <input type="text" id="profile-name" placeholder="Masukkan Nama Lengkap" disabled>
+                    <label for="profile-email">Email:</label>
+                    <input type="email" id="profile-email" value="user@example.com" disabled>
+                    <label for="profile-nik">NIK:</label>
+                    <input type="text" id="profile-nik" placeholder="Masukkan NIK Anda" disabled>
+                    <label for="profile-place-dob">Tempat, Tanggal Lahir:</label>
+                    <input type="text" id="profile-place-dob" placeholder="Contoh: Jakarta, 01/01/1990" disabled>
+                    <label for="profile-address">Alamat:</label>
+                    <input type="text" id="profile-address" placeholder="Masukkan Alamat Lengkap" disabled>
+                    <label for="profile-phone">Nomor Telepon:</label>
+                    <input type="text" id="profile-phone" placeholder="Masukkan Nomor Telepon" disabled>
+                    <button id="edit-profile-btn">Edit Profil</button>
+                    <button id="save-profile-btn" style="display: none;">Simpan Profil</button>
+                </div>
+
+                <div id="heart-rate-section" class="content-section">
+                    <h3>Detak Jantung (BPM)</h3>
+                    <div class="heart-rate-display" id="current-bpm-display">-- BPM</div>
+                    <p id="bpm-status-message">Fitur pemantauan detak jantung terintegrasi dengan alat sedang dalam pengembangan.</p>
+                    <button id="refresh-bpm-btn" style="display: none;">Refresh BPM (Simulasi)</button>
+
+                    <div id="doctor-bpm-view" style="display: none;">
+                        <h4>Daftar Detak Jantung Pasien:</h4>
+                        <ul id="patient-bpm-list">
+                            </ul>
+                    </div>
+                </div>
+
+                <div id="education-section" class="content-section">
+                    <h3>Pusat Edukasi Kesehatan Jantung</h3>
+                    <p>Dapatkan informasi terbaru mengenai kesehatan jantung, pencegahan, dan gaya hidup sehat.</p>
+                    <ul id="article-list">
+                        </ul>
+                </div>
+
+                <div id="chat-section" class="content-section">
+                    <h3>Konsultasi Chat</h3>
+                    <div id="patient-list-container" style="display: none;">
+                        </div>
+                    <h4 class="chat-with-patient-title" style="display: none;"></h4>
+                    <div class="chat-box" id="chat-messages">
+                        </div>
+                    <div class="chat-input">
+                        <input type="text" id="chat-message-input" placeholder="Ketik pesan Anda...">
+                        <button id="send-chat-btn">Kirim</button>
+                    </div>
+                    <p style="font-size: 0.9em; color: #888; text-align: center; margin-top: 15px;">
+                        *Layanan ini untuk konsultasi awal. Untuk diagnosis, segera temui dokter.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-
     <script>
         // Konfigurasi Firebase Anda (HARUS SESUAI DENGAN PROYEK FIREBASE ANDA)
         const firebaseConfig = {
             apiKey: "AIzaSyD8ROGRR-CvDaD3THjpFagbt-I0jFPoTEk",
             authDomain: "arrhythme-ai-29cc8.firebaseapp.com",
             projectId: "arrhythme-ai-29cc8",
-            storageBucket: "arrhythme-ai-29cc8.firebasestorage.app",
+            storageBucket: "arrhythme-ai-29cc8.firebaseapp.com",
             messagingSenderId: "869423405995",
             appId: "1:869423405995:web:d750c0530b9709029190ee"
-            // databaseURL: "https://arrhythme-ai-29cc8-default-rtdb.firebaseio.com", // Hapus atau komentari ini jika menggunakan Firestore
         };
 
         // Inisialisasi Firebase
@@ -453,8 +774,10 @@
         const db = firebase.firestore();
 
         // Dapatkan elemen DOM
-        const userEmailSpan = document.getElementById('user-email');
-        const userRoleSpan = document.getElementById('user-role');
+        const navUserEmailSpan = document.getElementById('nav-user-email');
+        const navUserRoleSpan = document.getElementById('nav-user-role');
+        const userEmailHomeSpan = document.getElementById('user-email-home');
+        const userRoleHomeSpan = document.getElementById('user-role-home');
         const logoutBtn = document.getElementById('logout-btn');
 
         // Navigasi
@@ -464,6 +787,7 @@
         const navChatBtn = document.getElementById('nav-chat');
 
         // Bagian Konten
+        const homeSection = document.getElementById('home-section');
         const profileSection = document.getElementById('profile-section');
         const heartRateSection = document.getElementById('heart-rate-section');
         const educationSection = document.getElementById('education-section');
@@ -493,22 +817,23 @@
         const chatMessagesDiv = document.getElementById('chat-messages');
         const chatMessageInput = document.getElementById('chat-message-input');
         const sendChatBtn = document.getElementById('send-chat-btn');
-
+        const chatWithPatientTitle = document.querySelector('.chat-with-patient-title'); // Gunakan class
+        
         // Variabel global untuk peran dan chat dokter
-        let currentUserRole = 'patient'; // Default role (akan di-overwrite dari Firestore)
-        let selectedPatientIdForDoctor = null; // UID pasien yang sedang dilihat/dibalas dokter
-        let selectedPatientNameForDoctor = ''; // Nama pasien yang sedang dilihat/dibalas dokter
+        let currentUserRole = 'patient';
+        let selectedPatientIdForDoctor = null;
+        let selectedPatientNameForDoctor = '';
 
         // Div untuk daftar pasien (hanya untuk dokter)
-        const patientListDiv = document.createElement('div');
-        patientListDiv.id = 'patient-list-container';
-        chatSection.insertBefore(patientListDiv, chatMessagesDiv); // Sisipkan di awal chatSection
+        const patientListDiv = document.getElementById('patient-list-container');
+
 
         // --- Fungsi Utama ---
 
         function showSection(sectionToShow) {
-            const sections = [profileSection, heartRateSection, educationSection, chatSection];
+            const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => {
+                // Sembunyikan semua section, kecuali yang akan ditampilkan
                 if (section === sectionToShow) {
                     section.style.display = 'block';
                 } else {
@@ -516,21 +841,31 @@
                 }
             });
 
+            // Atur kelas 'active' pada tombol navigasi
             const navButtons = document.querySelectorAll('.dashboard-nav button');
             navButtons.forEach(btn => btn.classList.remove('active'));
-            if (sectionToShow === profileSection) navProfileBtn.classList.add('active');
-            else if (sectionToShow === heartRateSection) navHeartRateBtn.classList.add('active');
-            else if (sectionToShow === educationSection) navEducationBtn.classList.add('active');
-            else if (sectionToShow === chatSection) navChatBtn.classList.add('active');
+
+            // Set active class berdasarkan section yang ditampilkan
+            if (sectionToShow === homeSection || sectionToShow === profileSection) {
+                navProfileBtn.classList.add('active');
+            } else if (sectionToShow === heartRateSection) {
+                navHeartRateBtn.classList.add('active');
+            } else if (sectionToShow === educationSection) {
+                navEducationBtn.classList.add('active');
+            } else if (sectionToShow === chatSection) {
+                navChatBtn.classList.add('active');
+            }
         }
+
 
         // --- Firebase Auth & Profile Management ---
 
         auth.onAuthStateChanged(user => {
             if (user) {
                 console.log("User logged in:", user.email);
-                userEmailSpan.textContent = user.email;
-                profileEmailInput.value = user.email;
+                navUserEmailSpan.textContent = user.email; // Update email di nav bar
+                userEmailHomeSpan.textContent = user.email; // Update email di home section
+                profileEmailInput.value = user.email; // Update email di profil input
 
                 db.collection('users').doc(user.uid).get().then(doc => {
                     if (doc.exists) {
@@ -541,43 +876,64 @@
                         profilePlaceDobInput.value = userData.placeDob || '';
                         profileAddressInput.value = userData.address || '';
                         profilePhoneInput.value = userData.phone || '';
-                        currentUserRole = userData.role || 'patient'; // Pastikan role terbaca
-                        userRoleSpan.textContent = currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1);
+                        currentUserRole = userData.role || 'patient';
+                        navUserRoleSpan.textContent = currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1); // Update peran di nav bar
+                        userRoleHomeSpan.textContent = currentUserRole.charAt(0).toUpperCase() + currentUserRole.slice(1); // Update peran di home section
 
                         // --- Logika Pengalihan Dashboard Berdasarkan Peran ---
                         if (currentUserRole === 'doctor') {
-                            // Dokter
-                            showSection(chatSection); // Default ke Chat
-                            navProfileBtn.style.display = 'none'; // Sembunyikan profil untuk dokter
-                            navHeartRateBtn.style.display = 'inline-block'; // Tampilkan tombol detak jantung
-                            navEducationBtn.style.display = 'none'; // Sembunyikan edukasi untuk dokter
-                            navChatBtn.classList.add('active'); // Pastikan tombol chat aktif
-                            patientListDiv.style.display = 'block'; // Tampilkan daftar pasien untuk dokter
+                            showSection(chatSection); // Default ke Chat untuk dokter
+                            // Tampilkan semua tombol navigasi untuk dokter jika perlu
+                            navProfileBtn.style.display = 'flex';
+                            navHeartRateBtn.style.display = 'flex';
+                            navEducationBtn.style.display = 'flex';
+                            navChatBtn.style.display = 'flex';
+                            
+                            // Tampilan khusus dokter di chat
+                            patientListDiv.style.display = 'block';
+                            chatWithPatientTitle.textContent = 'Pilih pasien untuk memulai chat';
+                            chatWithPatientTitle.style.display = 'block';
+                            chatMessagesDiv.innerHTML = '';
+                            chatMessageInput.disabled = true;
+                            sendChatBtn.disabled = true;
 
-                            doctorBpmView.style.display = 'block'; // Tampilkan bagian BPM pasien untuk dokter
-                            refreshBpmBtn.style.display = 'none'; // Sembunyikan tombol refresh BPM untuk dokter
+                            // Tampilan khusus dokter di detak jantung
+                            doctorBpmView.style.display = 'block';
+                            refreshBpmBtn.style.display = 'none'; // Dokter tidak refresh BPM sendiri
                             bpmStatusMessage.textContent = 'Data detak jantung semua pasien akan ditampilkan di sini.';
-                            loadPatientBPMs(); // Muat data BPM pasien
+                            loadPatientBPMs(); // Muat semua BPM pasien
                             loadPatientListForChat(); // Muat daftar pasien untuk chat
-                        } else {
-                            // Pasien
-                            showSection(profileSection); // Default ke Profil untuk pasien
-                            navProfileBtn.style.display = 'inline-block';
-                            navHeartRateBtn.style.display = 'inline-block';
-                            navEducationBtn.style.display = 'inline-block';
-                            navChatBtn.style.display = 'inline-block';
-                            patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien untuk pasien
 
-                            doctorBpmView.style.display = 'none'; // Sembunyikan bagian BPM pasien untuk pasien
-                            refreshBpmBtn.style.display = 'inline-block'; // Tampilkan tombol refresh BPM untuk pasien
-                            bpmStatusMessage.textContent = 'Data detak jantung terbaru Anda akan ditampilkan di sini.';
-                            loadPatientBPM(user.uid); // Muat BPM untuk pasien yang login
+                        } else { // Pasien
+                            showSection(homeSection); // ** Default ke Halaman Utama untuk pasien **
+                            // Tampilkan semua tombol navigasi untuk pasien
+                            navProfileBtn.style.display = 'flex';
+                            navHeartRateBtn.style.display = 'flex';
+                            navEducationBtn.style.display = 'flex';
+                            navChatBtn.style.display = 'flex';
+
+                            // Tampilan khusus pasien di chat
+                            patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien
+                            chatWithPatientTitle.style.display = 'none'; // Sembunyikan judul chat dengan pasien
+                            chatMessageInput.disabled = false;
+                            sendChatBtn.disabled = false;
+
+                            doctorBpmView.style.display = 'none'; // Sembunyikan tampilan BPM dokter
+                            refreshBpmBtn.style.display = 'none';
+                            bpmStatusMessage.textContent = 'Fitur pemantauan detak jantung terintegrasi dengan alat sedang dalam pengembangan.';
+                            
+                            // UID dokter umum untuk pasien
+                            const generalDoctorUid = 'g3hotB83GecyQRcNfzQedodfB8f2'; // UID Dokter Anda
+                            if (generalDoctorUid && generalDoctorUid !== 'Ganti_dengan_UID_Dokter_Anda') { // Pastikan UID diisi
+                                loadSpecificChat(generalDoctorUid, 'Dokter ArrhythME-AI');
+                            } else {
+                                chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #e53935;">UID Dokter belum dikonfigurasi. Harap hubungi administrator.</p>';
+                                chatMessageInput.disabled = true;
+                                sendChatBtn.disabled = true;
+                            }
                         }
-                        // --- Akhir Logika Pengalihan Dashboard ---
-
                     } else {
                         console.log("No user data found, creating new profile with default role 'patient'.");
-                        // Ini akan jarang terjadi jika sign-up sudah menyimpan peran, tapi tetap penting
                         db.collection('users').doc(user.uid).set({
                             email: user.email,
                             name: '',
@@ -585,25 +941,36 @@
                             placeDob: '',
                             address: '',
                             phone: '',
-                            role: 'patient', // Default role jika user tidak ada di Firestore
-                            // Tambahkan field untuk BPM agar bisa diupdate
-                            bpm: null,
-                            lastBpmUpdate: null
+                            role: 'patient',
+                            bpm: null, // Tambahkan bidang BPM
+                            lastBpmUpdate: null // Tambahkan bidang terakhir update BPM
                         }, { merge: true }).then(() => {
                             profileNameInput.value = '';
                             profileNikInput.value = '';
                             profilePlaceDobInput.value = '';
                             profileAddressInput.value = '';
                             profilePhoneInput.value = '';
-                            userRoleSpan.textContent = 'Pasien';
+                            navUserRoleSpan.textContent = 'Pasien';
+                            userRoleHomeSpan.textContent = 'Pasien';
                             currentUserRole = 'patient';
                             console.log("New user profile created successfully.");
-                            showSection(profileSection); // Tampilkan profil section
-                            patientListDiv.style.display = 'none'; // Sembunyikan daftar pasien
-                            doctorBpmView.style.display = 'none'; // Sembunyikan bagian BPM pasien
-                            refreshBpmBtn.style.display = 'inline-block'; // Tampilkan tombol refresh BPM
-                            bpmStatusMessage.textContent = 'Data detak jantung terbaru Anda akan ditampilkan di sini.';
-                            loadPatientBPM(user.uid); // Muat BPM untuk pasien yang login
+                            showSection(homeSection); // ** Tampilkan Halaman Utama untuk user baru **
+                            patientListDiv.style.display = 'none';
+                            chatWithPatientTitle.style.display = 'none';
+                            chatMessageInput.disabled = false;
+                            sendChatBtn.disabled = false;
+
+                            doctorBpmView.style.display = 'none';
+                            refreshBpmBtn.style.display = 'none';
+                            bpmStatusMessage.textContent = 'Fitur pemantauan detak jantung terintegrasi dengan alat sedang dalam pengembangan.';
+                            const generalDoctorUid = 'g3hotB83GecyQRcNfzQedodfB8f2'; // UID Dokter Anda
+                            if (generalDoctorUid && generalDoctorUid !== 'Ganti_dengan_UID_Dokter_Anda') {
+                                loadSpecificChat(generalDoctorUid, 'Dokter ArrhythME-AI');
+                            } else {
+                                chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #e53935;">UID Dokter belum dikonfigurasi. Harap hubungi administrator.</p>';
+                                chatMessageInput.disabled = true;
+                                sendChatBtn.disabled = true;
+                            }
                         }).catch(error => {
                             console.error("Error creating new user profile:", error);
                             alert("Gagal membuat profil baru: " + error.message);
@@ -616,7 +983,7 @@
 
             } else {
                 console.log("No user logged in, redirecting to index.html.");
-                window.location.href = 'index.html';
+                window.location.href = 'index.html'; // Redirect ke halaman login jika belum login
             }
         });
 
@@ -624,14 +991,13 @@
             try {
                 await auth.signOut();
                 alert('Anda telah berhasil logout.');
-                window.location.href = 'index.html';
+                window.location.href = 'index.html'; // Kembali ke halaman login
             } catch (error) {
                 console.error("Error during logout:", error);
                 alert("Gagal logout: " + error.message);
             }
         });
 
-        // Logika Edit dan Simpan Profil
         editProfileBtn.addEventListener('click', () => {
             profileNameInput.disabled = false;
             profileNikInput.disabled = false;
@@ -655,13 +1021,13 @@
                 try {
                     await db.collection('users').doc(user.uid).set({
                         name: userName,
-                        email: user.email,
+                        email: user.email, // Email tetap ada tapi disabled di form
                         nik: userNik,
                         placeDob: userPlaceDob,
                         address: userAddress,
                         phone: userPhone,
-                        role: currentUserRole // Pastikan peran juga disimpan
-                    }, { merge: true });
+                        role: currentUserRole // Pastikan peran tidak berubah saat simpan profil
+                    }, { merge: true }); // Gunakan merge: true untuk memperbarui tanpa menimpa data lain
 
                     alert('Profil berhasil disimpan!');
                     profileNameInput.disabled = true;
@@ -681,317 +1047,309 @@
             }
         });
 
-        // --- Heart Rate Section (Pasien & Dokter) ---
-
-        // Fungsi untuk memperbarui BPM pasien (simulasi)
-        async function updatePatientBPM(userId) {
-            try {
-                const randomBPM = Math.floor(Math.random() * (100 - 60 + 1)) + 60; // BPM antara 60-100
-                await db.collection('users').doc(userId).update({
-                    bpm: randomBPM,
-                    lastBpmUpdate: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                if (userId === auth.currentUser.uid) { // Hanya update display jika ini BPM user yang login
-                    currentBpmDisplay.textContent = `${randomBPM} BPM`;
-                    bpmStatusMessage.textContent = `Detak jantung Anda terbaru (${new Date().toLocaleTimeString()}).`;
-                }
-                console.log(`BPM user ${userId} diperbarui menjadi ${randomBPM}`);
-            } catch (error) {
-                console.error("Error updating BPM:", error);
-                alert("Gagal memperbarui BPM: " + error.message);
-            }
-        }
-
-        // Fungsi untuk memuat BPM pasien yang sedang login
         function loadPatientBPM(userId) {
-            db.collection('users').doc(userId).onSnapshot(doc => {
-                if (doc.exists) {
-                    const userData = doc.data();
-                    if (userData.bpm !== null) {
-                        currentBpmDisplay.textContent = `${userData.bpm} BPM`;
-                        let lastUpdate = 'Tidak diketahui';
-                        if (userData.lastBpmUpdate) {
-                            lastUpdate = userData.lastBpmUpdate.toDate().toLocaleTimeString();
-                        }
-                        bpmStatusMessage.textContent = `Detak jantung Anda terbaru (${lastUpdate}).`;
-                    } else {
-                        currentBpmDisplay.textContent = `-- BPM`;
-                        bpmStatusMessage.textContent = 'Belum ada data detak jantung. Klik "Refresh BPM" untuk simulasi.';
-                    }
+            db.collection('users').doc(userId).get().then(doc => {
+                if (doc.exists && doc.data().bpm !== undefined && doc.data().bpm !== null) {
+                    currentBpmDisplay.textContent = `${doc.data().bpm} BPM`;
+                    const lastUpdate = doc.data().lastBpmUpdate ? doc.data().lastBpmUpdate.toDate().toLocaleString() : 'N/A';
+                    bpmStatusMessage.textContent = `Detak jantung terakhir diukur pada: ${lastUpdate}`;
+                } else {
+                    currentBpmDisplay.textContent = '-- BPM';
+                    bpmStatusMessage.textContent = 'Data detak jantung belum tersedia. Pastikan perangkat terhubung.';
                 }
-            }, error => {
-                console.error("Error loading patient BPM:", error);
+            }).catch(error => {
+                console.error("Error fetching BPM:", error);
+                currentBpmDisplay.textContent = 'Error';
                 bpmStatusMessage.textContent = 'Gagal memuat data detak jantung.';
             });
         }
 
-        // Fungsi untuk memuat daftar BPM semua pasien (untuk dokter)
+        // Fungsi untuk dokter melihat semua BPM pasien
         function loadPatientBPMs() {
-            patientBpmList.innerHTML = ''; // Bersihkan daftar sebelumnya
-            db.collection('users')
-                .where('role', '==', 'patient')
-                .onSnapshot(snapshot => {
-                    patientBpmList.innerHTML = ''; // Bersihkan lagi untuk update real-time
-                    if (snapshot.empty) {
-                        patientBpmList.innerHTML = '<li>Belum ada data BPM dari pasien.</li>';
-                        return;
-                    }
-                    snapshot.forEach(doc => {
-                        const patientData = doc.data();
-                        const li = document.createElement('li');
-                        const bpmValue = patientData.bpm !== null ? `${patientData.bpm} BPM` : 'N/A';
-                        const lastUpdate = patientData.lastBpmUpdate ? patientData.lastBpmUpdate.toDate().toLocaleTimeString() : 'Belum ada data';
-                        li.innerHTML = `<strong>${patientData.name || patientData.email}</strong>: <span>${bpmValue}</span> (Update: ${lastUpdate})`;
-                        patientBpmList.appendChild(li);
-                    });
-                }, error => {
-                    console.error("Error loading all patient BPMs:", error);
-                    patientBpmList.innerHTML = '<li>Gagal memuat data BPM pasien.</li>';
+            patientBpmList.innerHTML = ''; // Kosongkan daftar sebelumnya
+            db.collection('users').where('role', '==', 'patient').get().then(querySnapshot => {
+                if (querySnapshot.empty) {
+                    patientBpmList.innerHTML = '<li>Belum ada data pasien.</li>';
+                    return;
+                }
+                querySnapshot.forEach(doc => {
+                    const patient = doc.data();
+                    const patientId = doc.id;
+                    const li = document.createElement('li');
+                    const bpmText = patient.bpm !== undefined && patient.bpm !== null ? `${patient.bpm} BPM` : '-- BPM';
+                    const lastUpdate = patient.lastBpmUpdate ? patient.lastBpmUpdate.toDate().toLocaleString() : 'N/A';
+                    li.innerHTML = `
+                        <strong>${patient.name || patient.email}</strong>
+                        <span>BPM: ${bpmText} (Terakhir: ${lastUpdate})</span>
+                    `;
+                    patientBpmList.appendChild(li);
                 });
+            }).catch(error => {
+                console.error("Error loading patient BPMs:", error);
+                patientBpmList.innerHTML = '<li>Gagal memuat data BPM pasien.</li>';
+            });
         }
-
-
-        refreshBpmBtn.addEventListener('click', () => {
-            const user = auth.currentUser;
-            if (user && currentUserRole === 'patient') {
-                updatePatientBPM(user.uid);
-            } else {
-                alert("Tombol ini untuk pasien untuk memperbarui BPM mereka (simulasi).");
-            }
-        });
-
 
         // --- Education Section ---
         const articles = [
             {
                 title: "Apa itu Aritmia? Pelajari Lebih Lanjut tentang Jenis dan Penyebabnya",
                 content: "Aritmia adalah kondisi di mana detak jantung tidak teratur, terlalu cepat, atau terlalu lambat. Ini terjadi ketika impuls listrik yang mengoordinasikan detak jantung tidak berfungsi dengan baik. Ada berbagai jenis aritmia, termasuk fibrilasi atrium, takikardia, dan bradikardia. Penyebabnya bisa bervariasi, mulai dari penyakit jantung, tekanan darah tinggi, stres, hingga konsumsi kafein atau alkohol berlebihan. Penting untuk mengenali gejala seperti pusing, pingsan, atau nyeri dada dan segera mencari pertolongan medis.",
-                link: "https://www.halodoc.com/kesehatan/aritmia" // Contoh link eksternal
+                link: "https://www.halodoc.com/kesehatan/aritmia"
             },
             {
                 title: "Tips Gaya Hidup Sehat untuk Jantung Optimal",
                 content: "Menjaga kesehatan jantung adalah kunci untuk hidup yang panjang dan berkualitas. Beberapa tips gaya hidup sehat meliputi: 1. Diet seimbang: Konsumsi buah, sayur, biji-bijian, dan protein tanpa lemak. Hindari makanan olahan, tinggi gula, dan lemak jenuh. 2. Olahraga teratur: Lakukan aktivitas fisik moderat setidaknya 150 menit per minggu. 3. Kelola stres: Cari cara sehat untuk mengatasi stres, seperti meditasi, yoga, atau hobi. 4. Tidur cukup: Pastikan Anda mendapatkan 7-9 jam tidur berkualitas setiap malam. 5. Hindari merokok dan batasi alkohol.",
-                link: "https://www.alodokter.com/gaya-hidup-sehat-untuk-menjaga-kesehatan-jantung"
+                link: "https://hellosehat.com/jantung/cara-menjaga-kesehatan-jantung/"
             },
             {
                 title: "Pentingnya Olahraga Teratur dan Nutrisi Seimbang",
                 content: "Olahraga teratur memperkuat otot jantung, meningkatkan sirkulasi darah, dan membantu menjaga berat badan ideal. Nutrisi seimbang menyediakan energi dan nutrisi penting yang dibutuhkan jantung untuk berfungsi optimal. Kombinasi keduanya secara signifikan mengurangi risiko penyakit jantung.",
-                link: "https://www.mayoclinic.org/diseases-conditions/heart-disease/in-depth/heart-healthy-diet/art-20047702"
+                link: "https://health.detik.com/kebugaran/d-6748494/10-manfaat-olahraga-bagi-tubuh-bisa-mengurangi-risiko-kematian"
             },
             {
                 title: "Panduan Pertolongan Pertama untuk Serangan Jantung",
                 content: "Mengenali gejala serangan jantung dan mengetahui pertolongan pertama dapat menyelamatkan nyawa. Gejala umum meliputi nyeri dada yang menjalar ke lengan, leher, rahang, atau punggung, sesak napas, keringat dingin, mual, dan pusing. Jika Anda atau seseorang di sekitar Anda mengalami gejala ini: 1. Segera hubungi layanan darurat (misalnya, 112 atau 911). 2. Bantu orang tersebut duduk dengan nyaman. 3. Jika orang tersebut sadar dan tidak alergi, berikan tablet aspirin untuk dikunyah (jika tersedia dan sesuai). 4. Longgarkan pakaian yang ketat. 5. Tetap tenang dan tunggu bantuan medis datang.",
-                link: "https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds)"
+                link: "https://hellosehat.com/jantung/penyakit-jantung/pengobatan-serangan-jantung/"
             }
         ];
 
         function loadEducationArticles() {
-            articleList.innerHTML = '';
+            articleList.innerHTML = ''; // Kosongkan daftar sebelumnya
             articles.forEach(article => {
                 const li = document.createElement('li');
+                li.className = 'article-item'; // Tambahkan kelas untuk styling
                 const h4 = document.createElement('h4');
                 const p = document.createElement('p');
-                const a = document.createElement('a');
+                const a = document.createElement('a'); // Buat elemen <a> untuk link
 
                 h4.textContent = article.title;
                 p.textContent = article.content;
-                a.href = article.link;
-                a.textContent = 'Baca Selengkapnya';
+                a.href = article.link; // Set href dari properti link di objek artikel
+                a.textContent = 'Baca Selengkapnya'; // Teks link
                 a.target = '_blank'; // Buka di tab baru
-                a.classList.add('article-link');
+                a.classList.add('article-link'); // Tambahkan kelas untuk styling
 
                 li.appendChild(h4);
                 li.appendChild(p);
-                li.appendChild(a); // Tambahkan link
+                li.appendChild(a); // Tambahkan link ke li
                 articleList.appendChild(li);
             });
         }
 
         // --- Chat Section ---
 
-        // Unsubscribe function for real-time listener
-        let unsubscribeChatListener = null;
+        function loadPatientListForChat() {
+            patientListDiv.innerHTML = ''; // Kosongkan daftar sebelumnya
+            const currentUser = auth.currentUser;
+            if (!currentUser || currentUserRole !== 'doctor') return;
 
-        function displayMessage(message, currentUserId) {
-            const messageDiv = document.createElement('div');
-            messageDiv.classList.add('message');
+            db.collection('users').where('role', '==', 'patient').get().then(querySnapshot => {
+                if (querySnapshot.empty) {
+                    patientListDiv.innerHTML = '<p style="text-align: center; color: #888;">Belum ada pasien yang terdaftar.</p>';
+                    return;
+                }
+                const ul = document.createElement('ul');
+                ul.style.listStyle = 'none';
+                ul.style.padding = '0';
+                querySnapshot.forEach(doc => {
+                    const patient = doc.data();
+                    const patientId = doc.id;
+                    const li = document.createElement('li');
+                    li.className = 'patient-item';
+                    li.textContent = patient.name || patient.email;
+                    li.dataset.patientId = patientId;
+                    li.dataset.patientName = patient.name || patient.email;
+                    li.addEventListener('click', () => {
+                        // Hapus selected dari semua item
+                        document.querySelectorAll('.patient-item').forEach(item => item.classList.remove('selected'));
+                        // Tambahkan selected ke item yang diklik
+                        li.classList.add('selected');
 
-            // Determine message sender role for styling
-            if (message.senderId === currentUserId) {
-                messageDiv.classList.add('user'); // Pesan dari user yang sedang login (baik pasien/dokter)
-                messageDiv.textContent = message.text;
-            } else if (message.senderRole === 'doctor') {
-                messageDiv.classList.add('doctor-reply'); // Pesan dari dokter (untuk pasien)
-                messageDiv.innerHTML = `<strong>Dokter ${message.senderName || message.senderEmail}:</strong> ${message.text}`;
-            } else if (message.senderRole === 'patient') {
-                messageDiv.classList.add('patient-other'); // Pesan dari pasien lain (untuk tampilan dokter)
-                messageDiv.innerHTML = `<strong>Pasien ${message.senderName || message.senderEmail}:</strong> ${message.text}`;
-            }
-            chatMessagesDiv.appendChild(messageDiv);
+                        selectedPatientIdForDoctor = patientId;
+                        selectedPatientNameForDoctor = patient.name || patient.email;
+                        chatWithPatientTitle.textContent = `Chat dengan ${selectedPatientNameForDoctor}`;
+                        chatWithPatientTitle.style.display = 'block';
+                        chatMessageInput.disabled = false;
+                        sendChatBtn.disabled = false;
+                        loadSpecificChat(patientId, selectedPatientNameForDoctor);
+                    });
+                    ul.appendChild(li);
+                });
+                patientListDiv.appendChild(ul);
+            }).catch(error => {
+                console.error("Error loading patient list:", error);
+                patientListDiv.innerHTML = '<p style="text-align: center; color: #e53935;">Gagal memuat daftar pasien.</p>';
+            });
         }
 
-        async function sendMessage() {
-            const messageText = chatMessageInput.value.trim();
-            const user = auth.currentUser;
+        let unsubscribeChat = null; // Variabel untuk menyimpan fungsi unsubscribe listener chat
 
-            if (!messageText || !user) {
+        function loadSpecificChat(targetUserId, targetUserName) {
+            if (unsubscribeChat) {
+                unsubscribeChat(); // Berhenti mendengarkan chat sebelumnya
+            }
+            chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #888;">Memuat pesan...</p>'; // Tampilkan pesan loading
+
+            const currentUser = auth.currentUser;
+            if (!currentUser) {
+                chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #e53935;">Anda harus login untuk melihat chat.</p>';
                 return;
             }
 
-            const userName = profileNameInput.value.trim() || user.email;
-            const userRole = currentUserRole;
+            const chatDocId = [currentUser.uid, targetUserId].sort().join('_');
 
-            try {
-                let chatData = {
-                    senderId: user.uid,
-                    senderRole: userRole,
-                    senderEmail: user.email,
-                    senderName: userName,
-                    text: messageText,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
-                    // Untuk pasien, originalPatientId adalah UID mereka sendiri
-                    // Untuk dokter, originalPatientId adalah UID pasien yang sedang mereka balas (selectedPatientIdForDoctor)
-                    originalPatientId: userRole === 'patient' ? user.uid : (selectedPatientIdForDoctor)
-                };
+            unsubscribeChat = db.collection('chats').doc(chatDocId).collection('messages')
+                .orderBy('timestamp')
+                .onSnapshot(snapshot => {
+                    chatMessagesDiv.innerHTML = ''; // Kosongkan chatbox
+                    if (snapshot.empty) {
+                        chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #888;">Belum ada pesan di sini. Mari mulai obrolan!</p>';
+                        return;
+                    }
+                    snapshot.forEach(doc => {
+                        const message = doc.data();
+                        const messageElement = document.createElement('div');
+                        messageElement.classList.add('message');
+                        messageElement.classList.add(message.senderId === currentUser.uid ? 'sent' : 'received');
 
-                // Validasi tambahan untuk dokter: harus memilih pasien
-                if (userRole === 'doctor' && !selectedPatientIdForDoctor) {
-                    alert('Dokter harus memilih pasien dari daftar untuk memulai atau melanjutkan chat.');
+                        const senderName = message.senderId === currentUser.uid ? 'Anda' : message.senderName;
+                        const timestamp = message.timestamp ? message.timestamp.toDate().toLocaleString() : 'Loading...';
+
+                        messageElement.innerHTML = `
+                            <span class="sender-name">${senderName}</span>
+                            <p>${message.text}</p>
+                            <span class="timestamp">${timestamp}</span>
+                        `;
+                        chatMessagesDiv.appendChild(messageElement);
+                    });
+                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+                }, error => {
+                    console.error("Error listening to chat messages:", error);
+                    chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #e53935;">Gagal memuat pesan. Terjadi kesalahan.</p>';
+                });
+        }
+
+        sendChatBtn.addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Anda harus login untuk mengirim pesan.");
+                return;
+            }
+
+            const messageText = chatMessageInput.value.trim();
+            if (messageText === '') {
+                return;
+            }
+
+            let recipientId;
+            let senderName = profileNameInput.value.trim() || user.email; // Gunakan nama dari profil jika ada
+            let recipientName;
+
+            if (currentUserRole === 'doctor') {
+                if (!selectedPatientIdForDoctor) {
+                    alert("Pilih pasien terlebih dahulu untuk mengirim pesan.");
+                    return;
+                }
+                recipientId = selectedPatientIdForDoctor;
+                recipientName = selectedPatientNameForDoctor; // Nama pasien yang dipilih
+            } else { // Pasien
+                const generalDoctorUid = 'g3hotB83GecyQRcNfzQedodfB8f2';
+                const generalDoctorName = 'Dokter ArrhythME-AI'; // Nama tampilan untuk dokter umum
+
+                if (!generalDoctorUid || generalDoctorUid === 'Ganti_dengan_UID_Dokter_Anda') {
+                    alert("UID dokter umum belum diatur. Harap hubungi administrator.");
                     return;
                 }
 
-                await db.collection('chats').add(chatData);
-                chatMessageInput.value = '';
-                // Scroll akan otomatis jika onSnapshot terpicu
+                // Opsional: verifikasi apakah UID adalah dokter
+                const doctorDoc = await db.collection('users').doc(generalDoctorUid).get();
+                if (!doctorDoc.exists || doctorDoc.data().role !== 'doctor') {
+                    alert("Maaf, layanan chat dokter belum tersedia atau dokter utama tidak ditemukan. Harap hubungi administrator.");
+                    console.error("Dokter umum dengan UID", generalDoctorUid, "tidak ditemukan atau bukan berstatus dokter.");
+                    return;
+                }
+
+                recipientId = generalDoctorUid;
+                recipientName = generalDoctorName;
+            }
+
+            // Buat ID dokumen chat yang konsisten (diurutkan berdasarkan UID)
+            const chatDocId = [user.uid, recipientId].sort().join('_');
+
+            try {
+                await db.collection('chats').doc(chatDocId).collection('messages').add({
+                    senderId: user.uid,
+                    senderName: senderName,
+                    recipientId: recipientId,
+                    recipientName: recipientName,
+                    text: messageText,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp() // Gunakan timestamp server
+                });
+                chatMessageInput.value = ''; // Kosongkan input setelah kirim
             } catch (error) {
                 console.error("Error sending message:", error);
                 alert("Gagal mengirim pesan: " + error.message);
             }
-        }
-
-        sendChatBtn.addEventListener('click', sendMessage);
-        chatMessageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                sendMessage();
-            }
         });
 
 
-        // Fungsi untuk memuat pesan chat yang spesifik (dipanggil oleh pasien atau dokter setelah memilih pasien)
-        function loadSpecificChat(targetPatientId, targetPatientName) {
-            // Hentikan listener sebelumnya jika ada
-            if (unsubscribeChatListener) {
-                unsubscribeChatListener();
-                console.log("Previous chat listener unsubscribed.");
-            }
-
-            chatMessagesDiv.innerHTML = `<h4 class="chat-with-patient-title">Chat dengan ${targetPatientName || 'Pasien'}</h4>`; // Kosongkan chat dan beri judul
-            selectedPatientIdForDoctor = targetPatientId; // Update ID pasien yang dipilih
-
-            unsubscribeChatListener = db.collection('chats')
-                .where('originalPatientId', '==', targetPatientId)
-                .orderBy('timestamp')
-                .onSnapshot(snapshot => {
-                    chatMessagesDiv.innerHTML = `<h4 class="chat-with-patient-title">Chat dengan ${targetPatientName || 'Pasien'}</h4>`; // Kosongkan lagi untuk update real-time
-                    snapshot.forEach(doc => {
-                        const message = doc.data();
-                        displayMessage(message, auth.currentUser.uid); // Pass current user's UID for styling
-                    });
-                    chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
-                }, error => {
-                    console.error("Error loading specific chat messages:", error);
-                    chatMessagesDiv.innerHTML = `<p style="text-align: center; color: red;">Gagal memuat chat.</p>`;
-                });
-        }
-
-
-        // Fungsi untuk memuat daftar pasien untuk dokter
-        function loadPatientListForChat() {
-            patientListDiv.innerHTML = '<h4>Daftar Chat Pasien:</h4>';
-            // Dapatkan semua pasien yang pernah mengirim pesan
-            db.collection('chats')
-                .where('senderRole', '==', 'patient')
-                .get() // Menggunakan get() untuk daftar pasien, bukan onSnapshot
-                .then(snapshot => {
-                    const uniquePatients = new Map();
-                    snapshot.forEach(doc => {
-                        const message = doc.data();
-                        if (message.originalPatientId && !uniquePatients.has(message.originalPatientId)) {
-                            uniquePatients.set(message.originalPatientId, {
-                                id: message.originalPatientId,
-                                name: message.senderName,
-                                email: message.senderEmail
-                            });
-                        }
-                    });
-
-                    if (uniquePatients.size === 0) {
-                        patientListDiv.innerHTML = '<p>Belum ada pasien yang memulai chat.</p>';
-                        // Sembunyikan input chat jika tidak ada pasien
-                        chatMessageInput.disabled = true;
-                        sendChatBtn.disabled = true;
-                    } else {
-                        uniquePatients.forEach(patient => {
-                            const patientButton = document.createElement('button');
-                            patientButton.textContent = `Chat dengan ${patient.name || patient.email}`;
-                            patientButton.dataset.patientId = patient.id;
-                            patientButton.dataset.patientName = patient.name || patient.email; // Simpan nama untuk judul
-
-                            patientButton.addEventListener('click', function() {
-                                // Hapus highlight dari semua tombol pasien
-                                document.querySelectorAll('#patient-list-container button').forEach(btn => {
-                                    btn.classList.remove('active-patient');
-                                });
-                                // Tambahkan highlight ke tombol yang sedang diklik
-                                this.classList.add('active-patient');
-
-                                selectedPatientIdForDoctor = patient.id; // Set ID pasien yang dipilih
-                                selectedPatientNameForDoctor = patient.name || patient.email; // Set nama pasien yang dipilih
-
-                                // Aktifkan input chat
-                                chatMessageInput.disabled = false;
-                                sendChatBtn.disabled = false;
-
-                                // Muat chat spesifik pasien ini
-                                loadSpecificChat(selectedPatientIdForDoctor, selectedPatientNameForDoctor);
-                            });
-                            patientListDiv.appendChild(patientButton);
-                        });
-                        // Pada awalnya, chat input dinonaktifkan sampai dokter memilih pasien
-                        chatMessageInput.disabled = true;
-                        sendChatBtn.disabled = true;
-                    }
-                })
-                .catch(error => {
-                    console.error("Error loading patient list for chat:", error);
-                    patientListDiv.innerHTML = '<p>Gagal memuat daftar pasien.</p>';
-                });
-        }
-
-
-        // --- Inisialisasi Saat Halaman Dimuat ---
+        // Event listener untuk navigasi
         document.addEventListener('DOMContentLoaded', () => {
-            loadEducationArticles(); // Muat artikel edukasi
+            // onAuthStateChanged akan menentukan section awal yang ditampilkan (homeSection atau chatSection)
+            // Jadi tidak perlu panggil showSection di sini saat DOMContentLoaded
 
-            navProfileBtn.addEventListener('click', () => showSection(profileSection));
-            navHeartRateBtn.addEventListener('click', () => showSection(heartRateSection));
-            navEducationBtn.addEventListener('click', () => showSection(educationSection));
+            navProfileBtn.addEventListener('click', () => {
+                showSection(profileSection);
+            });
+            navHeartRateBtn.addEventListener('click', () => {
+                showSection(heartRateSection);
+                if (currentUserRole === 'doctor') {
+                    loadPatientBPMs(); // Muat ulang BPM pasien jika dokter
+                } else {
+                    loadPatientBPM(auth.currentUser.uid); // Muat BPM pengguna sendiri jika pasien
+                }
+            });
+            navEducationBtn.addEventListener('click', () => {
+                showSection(educationSection);
+                loadEducationArticles(); // Muat ulang artikel edukasi
+            });
             navChatBtn.addEventListener('click', () => {
                 showSection(chatSection);
                 if (currentUserRole === 'doctor') {
                     // Jika dokter mengklik tab chat, muat ulang daftar pasien jika belum ada yang dipilih
                     if (!selectedPatientIdForDoctor) {
                         loadPatientListForChat();
-                        chatMessagesDiv.innerHTML = '<h3>Pilih pasien dari daftar di atas untuk melihat chat.</h3>'; // Pesan awal untuk dokter
-                    }
-                } else {
-                    // Pasien selalu langsung memuat chat mereka sendiri
-                    // Perlu memastikan user.uid tersedia, ini akan aman karena onAuthStateChanged sudah memeriksa user
-                    // Perlu juga nama user untuk judul chat
-                    if (auth.currentUser) {
-                        loadSpecificChat(auth.currentUser.uid, profileNameInput.value.trim() || 'Anda');
+                        chatWithPatientTitle.textContent = 'Pilih pasien dari daftar di atas untuk melihat chat.';
+                        chatWithPatientTitle.style.display = 'block';
+                        chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #888;">Belum ada pesan di sini. Pilih pasien untuk memulai obrolan.</p>';
+                        chatMessageInput.disabled = true;
+                        sendChatBtn.disabled = true;
                     } else {
-                        chatMessagesDiv.innerHTML = '<h3>Harap login untuk menggunakan fitur chat.</h3>';
+                        // Jika sudah ada pasien yang dipilih, muat chat spesifik
+                        loadSpecificChat(selectedPatientIdForDoctor, selectedPatientNameForDoctor);
+                        chatWithPatientTitle.textContent = `Chat dengan ${selectedPatientNameForDoctor}`;
+                        chatWithPatientTitle.style.display = 'block';
+                        chatMessageInput.disabled = false;
+                        sendChatBtn.disabled = false;
+                    }
+                } else { // Pasien
+                    if (auth.currentUser) {
+                        const generalDoctorUid = 'g3hotB83GecyQRcNfzQedodfB8f2'; // UID Dokter Anda
+                        if (generalDoctorUid && generalDoctorUid !== 'Ganti_dengan_UID_Dokter_Anda') { 
+                            loadSpecificChat(generalDoctorUid, 'Dokter ArrhythME-AI');
+                            chatWithPatientTitle.style.display = 'none'; // Pasien tidak perlu judul 'chat dengan dokter'
+                            chatMessageInput.disabled = false;
+                            sendChatBtn.disabled = false;
+                        } else {
+                            chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #e53935;">Fitur chat dokter belum dikonfigurasi. Harap hubungi administrator.</p>';
+                            chatMessageInput.disabled = true;
+                            sendChatBtn.disabled = true;
+                        }
+                    } else {
+                        chatMessagesDiv.innerHTML = '<p style="text-align: center; color: #e53935;">Harap login untuk menggunakan fitur chat.</p>';
+                        chatMessageInput.disabled = true;
+                        sendChatBtn.disabled = true;
                     }
                 }
             });
