@@ -73,11 +73,6 @@
             margin-bottom: 10px;
         }
 
-        .dashboard-nav .profile-summary p {
-            margin: 5px 0;
-            font-size: 1em;
-        }
-
         .welcome-container {
             display: flex;
             align-items: center;
@@ -152,6 +147,7 @@
             overflow-y: auto; 
         }
 
+        /* Update this to show home section by default, and others hidden */
         .dashboard-content-sections .content-section {
             display: none; 
             width: 100%;
@@ -159,7 +155,14 @@
             margin: 0 auto; 
         }
 
-        .dashboard-content-sections .content-section.active {
+        /* Explicitly show home section when it's active */
+        #home-section.active {
+            display: flex; /* or block, depending on its internal layout */
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .content-section.active {
             display: block; 
         }
 
@@ -676,80 +679,80 @@
         </div>
 
         <div class="dashboard-main-content">
-            <div class="welcome-container">
-                <img src="image/jantung.gif" alt="Heart Animation" class="heart-img" />
-                <div class="header-info">
-                    <h1>Selamat Datang di Dashboard</h1>
-                    <h1>ArrhythME-AI!</h1>
-                    <p>Email Anda: <span id="user-email-home" class="user-info">Memuat...</span></p>
-                    <p>Peran Anda: <span id="user-role-home" class="user-info">Memuat...</span></p>
-                    <p>Di sini Anda dapat memantau detak jantung, melihat riwayat analisis, dan mengelola pengaturan.</p>
-                    <p>Fitur-fitur canggih akan segera hadir!</p>
+            <div id="home-section" class="content-section active"> 
+                <div class="welcome-container">
+                    <img src="image/jantung.gif" alt="Heart Animation" class="heart-img" />
+                    <div class="header-info">
+                        <h1>Selamat Datang di Dashboard</h1>
+                        <h1>ArrhythME-AI!</h1>
+                        <p>Email Anda: <span id="user-email-home" class="user-info">Memuat...</span></p>
+                        <p>Peran Anda: <span id="user-role-home" class="user-info">Memuat...</span></p>
+                        <p>Di sini Anda dapat memantau detak jantung, melihat riwayat analisis, dan mengelola pengaturan.</p>
+                        <p>Fitur-fitur canggih akan segera hadir!</p>
+                    </div>
+                </div>
+                <p style="text-align: center; color: #666; margin-top: 35px;">
+                    Silakan pilih menu di samping untuk melanjutkan.
+                </p>
+            </div>
+            
+            <div id="profile-section" class="content-section">
+                <div class="profile-header">
+                    <div class="profile-icon">
+                        <i class="fas fa-user-alt"></i>
+                    </div>
+                    <h3>Profil Pengguna</h3>
+                </div>
+                <label for="profile-name">Nama:</label>
+                <input type="text" id="profile-name" placeholder="Masukkan Nama Lengkap" disabled>
+                <label for="profile-email">Email:</label>
+                <input type="email" id="profile-email" value="user@example.com" disabled>
+                <label for="profile-nik">NIK:</label>
+                <input type="text" id="profile-nik" placeholder="Masukkan NIK Anda" disabled>
+                <label for="profile-place-dob">Tempat, Tanggal Lahir:</label>
+                <input type="text" id="profile-place-dob" placeholder="Contoh: Jakarta, 01/01/1990" disabled>
+                <label for="profile-address">Alamat:</label>
+                <input type="text" id="profile-address" placeholder="Masukkan Alamat Lengkap" disabled>
+                <label for="profile-phone">Nomor Telepon:</label>
+                <input type="text" id="profile-phone" placeholder="Masukkan Nomor Telepon" disabled>
+                <button id="edit-profile-btn">Edit Profil</button>
+                <button id="save-profile-btn" style="display: none;">Simpan Profil</button>
+            </div>
+
+            <div id="heart-rate-section" class="content-section">
+                <h3>Detak Jantung (BPM)</h3>
+                <div class="heart-rate-display" id="current-bpm-display">-- BPM</div>
+                <p id="bpm-status-message">Fitur pemantauan detak jantung terintegrasi dengan alat sedang dalam pengembangan.</p>
+                <button id="refresh-bpm-btn" style="display: none;">Refresh BPM (Simulasi)</button>
+
+                <div id="doctor-bpm-view" style="display: none;">
+                    <h4>Daftar Detak Jantung Pasien:</h4>
+                    <ul id="patient-bpm-list">
+                    </ul>
                 </div>
             </div>
-                <p style="text-align: center; color: #666; margin-top: 35px;">
-                Silakan pilih menu di samping untuk melanjutkan.
+
+            <div id="education-section" class="content-section">
+                <h3>Pusat Edukasi Kesehatan Jantung</h3>
+                <p>Dapatkan informasi terbaru mengenai kesehatan jantung, pencegahan, dan gaya hidup sehat.</p>
+                <ul id="article-list">
+                </ul>
+            </div>
+
+            <div id="chat-section" class="content-section">
+                <h3>Konsultasi Chat</h3>
+                <div id="patient-list-container" style="display: none;">
+                </div>
+                <h4 class="chat-with-patient-title" style="display: none;"></h4>
+                <div class="chat-box" id="chat-messages">
+                </div>
+                <div class="chat-input">
+                    <input type="text" id="chat-message-input" placeholder="Ketik pesan Anda...">
+                    <button id="send-chat-btn">Kirim</button>
+                </div>
+                <p style="font-size: 0.9em; color: #888; text-align: center; margin-top: 15px;">
+                    *Layanan ini untuk konsultasi awal. Untuk diagnosis, segera temui dokter.
                 </p>
-
-                </div>
-                <div id="profile-section" class="content-section">
-                    <div class="profile-header">
-                        <div class="profile-icon">
-                            <i class="fas fa-user-alt"></i>
-                        </div>
-                        <h3>Profil Pengguna</h3>
-                    </div>
-                    <label for="profile-name">Nama:</label>
-                    <input type="text" id="profile-name" placeholder="Masukkan Nama Lengkap" disabled>
-                    <label for="profile-email">Email:</label>
-                    <input type="email" id="profile-email" value="user@example.com" disabled>
-                    <label for="profile-nik">NIK:</label>
-                    <input type="text" id="profile-nik" placeholder="Masukkan NIK Anda" disabled>
-                    <label for="profile-place-dob">Tempat, Tanggal Lahir:</label>
-                    <input type="text" id="profile-place-dob" placeholder="Contoh: Jakarta, 01/01/1990" disabled>
-                    <label for="profile-address">Alamat:</label>
-                    <input type="text" id="profile-address" placeholder="Masukkan Alamat Lengkap" disabled>
-                    <label for="profile-phone">Nomor Telepon:</label>
-                    <input type="text" id="profile-phone" placeholder="Masukkan Nomor Telepon" disabled>
-                    <button id="edit-profile-btn">Edit Profil</button>
-                    <button id="save-profile-btn" style="display: none;">Simpan Profil</button>
-                </div>
-
-                <div id="heart-rate-section" class="content-section">
-                    <h3>Detak Jantung (BPM)</h3>
-                    <div class="heart-rate-display" id="current-bpm-display">-- BPM</div>
-                    <p id="bpm-status-message">Fitur pemantauan detak jantung terintegrasi dengan alat sedang dalam pengembangan.</p>
-                    <button id="refresh-bpm-btn" style="display: none;">Refresh BPM (Simulasi)</button>
-
-                    <div id="doctor-bpm-view" style="display: none;">
-                        <h4>Daftar Detak Jantung Pasien:</h4>
-                        <ul id="patient-bpm-list">
-                            </ul>
-                    </div>
-                </div>
-
-                <div id="education-section" class="content-section">
-                    <h3>Pusat Edukasi Kesehatan Jantung</h3>
-                    <p>Dapatkan informasi terbaru mengenai kesehatan jantung, pencegahan, dan gaya hidup sehat.</p>
-                    <ul id="article-list">
-                        </ul>
-                </div>
-
-                <div id="chat-section" class="content-section">
-                    <h3>Konsultasi Chat</h3>
-                    <div id="patient-list-container" style="display: none;">
-                        </div>
-                    <h4 class="chat-with-patient-title" style="display: none;"></h4>
-                    <div class="chat-box" id="chat-messages">
-                        </div>
-                    <div class="chat-input">
-                        <input type="text" id="chat-message-input" placeholder="Ketik pesan Anda...">
-                        <button id="send-chat-btn">Kirim</button>
-                    </div>
-                    <p style="font-size: 0.9em; color: #888; text-align: center; margin-top: 15px;">
-                        *Layanan ini untuk konsultasi awal. Untuk diagnosis, segera temui dokter.
-                    </p>
-                </div>
             </div>
         </div>
     </div>
@@ -833,19 +836,19 @@
         function showSection(sectionToShow) {
             const sections = document.querySelectorAll('.content-section');
             sections.forEach(section => {
-                // Sembunyikan semua section, kecuali yang akan ditampilkan
-                if (section === sectionToShow) {
-                    section.style.display = 'block';
-                } else {
-                    section.style.display = 'none';
-                }
+                section.classList.remove('active'); // Remove active from all sections
+                section.style.display = 'none'; // Hide all sections
             });
+
+            // Set the active section and display it
+            sectionToShow.classList.add('active');
+            sectionToShow.style.display = (sectionToShow === homeSection) ? 'flex' : 'block'; // Adjust display type for home section if needed
 
             // Atur kelas 'active' pada tombol navigasi
             const navButtons = document.querySelectorAll('.dashboard-nav button');
             navButtons.forEach(btn => btn.classList.remove('active'));
 
-            // Set active class berdasarkan section yang ditampilkan
+            // Set active class based on the displayed section
             if (sectionToShow === homeSection || sectionToShow === profileSection) {
                 navProfileBtn.classList.add('active');
             } else if (sectionToShow === heartRateSection) {
